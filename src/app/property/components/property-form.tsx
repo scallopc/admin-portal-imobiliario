@@ -592,7 +592,7 @@ export default function PropertyForm({
                 Imagens <span className="text-red-500">*</span>
               </FormLabel>
               <FormControl>
-                <ImageUpload value={field.value as any[] || []} onChange={field.onChange} onRemoveUrl={onRemoveUrl} />
+                <ImageUpload value={field.value as any[] || []} onChange={field.onChange} onBlur={field.onBlur} onRemoveUrl={onRemoveUrl} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -605,7 +605,7 @@ export default function PropertyForm({
             <FormItem>
               <FormLabel>Imagens das Plantas</FormLabel>
               <FormControl>
-                <ImageUpload value={field.value as any[] || []} onChange={field.onChange} onRemoveUrl={onRemoveUrl} />
+                <ImageUpload value={field.value as any[] || []} onChange={field.onChange} onBlur={field.onBlur} onRemoveUrl={onRemoveUrl} />
               </FormControl>
               <FormMessage />
             </FormItem>

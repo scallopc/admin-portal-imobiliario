@@ -14,10 +14,11 @@ type ImageValue = string | File;
 type ImageUploadProps = {
   value: ImageValue[];
   onChange: (value: ImageValue[]) => void;
+  onBlur?: () => void;
   onRemoveUrl?: (url: string) => void; // Nova prop
   className?: string;
 };
-export function ImageUpload({ value = [], onChange, onRemoveUrl, className }: ImageUploadProps) {
+export function ImageUpload({ value = [], onChange, onBlur, onRemoveUrl, className }: ImageUploadProps) {
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null)
   const [isAnimating, setIsAnimating] = useState<number | null>(null)
   const prevValueRef = useRef<ImageValue[]>(value);
@@ -90,8 +91,9 @@ export function ImageUpload({ value = [], onChange, onRemoveUrl, className }: Im
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       onChange([...value, ...acceptedFiles]);
+      onBlur?.();
     },
-    [value, onChange]
+    [value, onChange, onBlur]
   );
 
   const removeImage = (index: number) => {
@@ -108,6 +110,7 @@ export function ImageUpload({ value = [], onChange, onRemoveUrl, className }: Im
 
     // Atualiza o estado visual removendo o item
     onChange(value.filter((_, i) => i !== index));
+    onBlur?.();
   };
 
   const { getRootProps, getInputProps, isDragActive, fileRejections } = useDropzone({

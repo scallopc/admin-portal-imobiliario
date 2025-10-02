@@ -48,11 +48,6 @@ export default function PropertyTable() {
     router.push(`/property/${property.id}`)
   }
 
-  const handleView = (property: PropertyListItem) => {
-    setPropertyToView(property.id)
-    setViewDialogOpen(true)
-  }
-
   const handleDeleteClick = (property: PropertyListItem) => {
     setSelectedProperty(property)
     setDeleteDialogOpen(true)
@@ -60,8 +55,11 @@ export default function PropertyTable() {
 
   const handleConfirmDelete = () => {
     if (selectedProperty?.id) {
-      deleteProperty(selectedProperty.id)
-      setDeleteDialogOpen(false)
+      deleteProperty(selectedProperty.id, {
+        onSuccess: () => {
+          setDeleteDialogOpen(false)
+        },
+      })
     }
   }
 
