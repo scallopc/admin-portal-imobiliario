@@ -5,8 +5,6 @@ export async function POST(request: NextRequest) {
   try {
     const { description } = await request.json();
 
-    console.log("Dados recebidos:", { description });
-
     if (!description) {
       return NextResponse.json({ message: "Descrição é obrigatória" }, { status: 400 });
     }

@@ -69,8 +69,8 @@ export function ExcelImportForm({ columns, items, onCancel, onSubmit, descriptio
             .replace(/\./g, "")
             .replace(/,/g, ".")
             .replace(/[^0-9.\-]/g, "")
-        const n = parseFloat(s)
-        return Number.isFinite(n) ? n : undefined
+          const n = parseFloat(s)
+          return Number.isFinite(n) ? n : undefined
         }
         return undefined
       }
@@ -108,8 +108,7 @@ export function ExcelImportForm({ columns, items, onCancel, onSubmit, descriptio
         release: values.release,
         units: normalizedUnits,
       }
-      
-      console.log('Payload sendo enviado do excel-import-form:', payload)
+
       await importMutation.mutateAsync(payload)
       await queryClient.invalidateQueries({ queryKey: releasesQueryKey() })
       toast.success("Importação concluída")
@@ -153,7 +152,7 @@ export function ExcelImportForm({ columns, items, onCancel, onSubmit, descriptio
       }
     }
     await handleSubmit(structuredData)
-}
+  }
 
   return (
     <div className="space-y-6">

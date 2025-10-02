@@ -17,6 +17,8 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useRouter } from "next/navigation";
 import { useImproveAll } from "@/hooks/mutations/use-improve-all";
+import { v4 as uuidv4 } from 'uuid';
+import { useState, useEffect } from 'react';
 
 const propertyFormSchema = propertyBaseSchema.extend({
   address: addressSchema,
@@ -27,20 +29,32 @@ export type PropertyFormValues = z.infer<typeof propertyFormSchema>;
 type PropertyFormProps = {
   defaultValues?: Partial<PropertyFormValues>;
   onSubmit: (values: PropertyFormValues) => Promise<void>;
+  onRemoveUrl?: (url: string) => void; // Nova prop
   isSubmitting?: boolean;
   submitText?: string;
   isEdit?: boolean;
   onCancel?: () => void;
+  propertyId?: string;
 };
 
 export default function PropertyForm({
   defaultValues,
   onSubmit,
+  onRemoveUrl, // Nova prop
   isSubmitting = false,
   submitText = "Salvar",
+  isEdit = false,
+  propertyId: initialPropertyId,
 }: PropertyFormProps) {
   const router = useRouter();
   const improveAllMutation = useImproveAll();
+  const [propertyId, setPropertyId] = useState(initialPropertyId || '');
+
+  useEffect(() => {
+    if (!isEdit && !initialPropertyId) {
+      setPropertyId(uuidv4());
+    }
+  }, [isEdit, initialPropertyId]);
   const form = useForm<PropertyFormValues>({
     resolver: zodResolver(propertyFormSchema),
     defaultValues: {
@@ -98,14 +112,14 @@ export default function PropertyForm({
 
   const handleSubmit = async (values: PropertyFormValues) => {
     try {
-      
+
       // Verificar se o formulário é válido
       const isValid = await form.trigger();
       if (!isValid) {
         toast.error("Por favor, preencha todos os campos obrigatórios.");
         return;
       }
-      
+
       await onSubmit(values);
       router.push(`/property`);
     } catch (error) {
@@ -132,7 +146,7 @@ export default function PropertyForm({
       form.setValue("title", result.title);
       form.setValue("slug", result.slug);
       form.setValue("seo", result.seo);
-      
+
       toast.success("Todos os campos foram otimizados com IA!");
     } catch (error) {
       console.error("Erro ao melhorar com IA:", error);
@@ -325,10 +339,10 @@ export default function PropertyForm({
           render={({ field }) => (
             <FormItem className="md:col-span-2">
               <div className="mb-2 flex items-center justify-between">
-              <FormLabel>
-                Descrição <span className="text-red-500">*</span>
-              </FormLabel>
-              <Button
+                <FormLabel>
+                  Descrição <span className="text-red-500">*</span>
+                </FormLabel>
+                <Button
                   type="button"
                   variant="outline"
                   size="sm"
@@ -443,109 +457,109 @@ export default function PropertyForm({
           />
         </div>
         <div className="grid grid-cols-1 gap-4 md:col-span-2 md:grid-cols-4">
-        <FormField
-          control={form.control}
-          name="bedrooms"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                Dormitórios <span className="text-red-500">*</span>
-              </FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  value={field.value}
-                  onChange={e => field.onChange(Number(e.target.value) || 0)}
-                  placeholder="0"
-                  min="0"
-                  step="1"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="bedrooms"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Dormitórios <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    value={field.value}
+                    onChange={e => field.onChange(Number(e.target.value) || 0)}
+                    placeholder="0"
+                    min="0"
+                    step="1"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="bathrooms"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                Banheiros <span className="text-red-500">*</span>
-              </FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  value={field.value}
-                  onChange={e => field.onChange(Number(e.target.value) || 0)}
-                  placeholder="0"
-                  min="0"
-                  step="1"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="bathrooms"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Banheiros <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    value={field.value}
+                    onChange={e => field.onChange(Number(e.target.value) || 0)}
+                    placeholder="0"
+                    min="0"
+                    step="1"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="suites"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                Suítes <span className="text-red-500">*</span>
-              </FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  value={field.value}
-                  onChange={e => field.onChange(Number(e.target.value) || 0)}
-                  placeholder="0"
-                  min="0"
-                  step="1"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="suites"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Suítes <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    value={field.value}
+                    onChange={e => field.onChange(Number(e.target.value) || 0)}
+                    placeholder="0"
+                    min="0"
+                    step="1"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="suiteDetails"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Detalhes das Suítes</FormLabel>
-              <FormControl>
-                <Input placeholder="Ex: 1 suíte master com closet" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="suiteDetails"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Detalhes das Suítes</FormLabel>
+                <FormControl>
+                  <Input placeholder="Ex: 1 suíte master com closet" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
         <div className="grid grid-cols-1 gap-4 md:col-span-2 md:grid-cols-2">
-        <FormField
-          control={form.control}
-          name="seo"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>SEO (Meta Description)</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Digite uma descrição otimizada para SEO (máximo 160 caracteres)"
-                  value={field.value || ""}
-                  onChange={field.onChange}
-                  maxLength={160}
-                />
-              </FormControl>
-              <FormMessage />
-              <p className="text-muted-foreground text-sm">{field.value?.length || 0}/160 caracteres</p>
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="seo"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>SEO (Meta Description)</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Digite uma descrição otimizada para SEO (máximo 160 caracteres)"
+                    value={field.value || ""}
+                    onChange={field.onChange}
+                    maxLength={160}
+                  />
+                </FormControl>
+                <FormMessage />
+                <p className="text-muted-foreground text-sm">{field.value?.length || 0}/160 caracteres</p>
+              </FormItem>
+            )}
+          />
 
           <FormField
             control={form.control}
@@ -578,7 +592,7 @@ export default function PropertyForm({
                 Imagens <span className="text-red-500">*</span>
               </FormLabel>
               <FormControl>
-                <ImageUpload value={field.value} onChange={field.onChange} />
+                <ImageUpload value={field.value as any[] || []} onChange={field.onChange} onRemoveUrl={onRemoveUrl} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -591,7 +605,7 @@ export default function PropertyForm({
             <FormItem>
               <FormLabel>Imagens das Plantas</FormLabel>
               <FormControl>
-                <ImageUpload value={field.value || []} onChange={field.onChange} />
+                <ImageUpload value={field.value as any[] || []} onChange={field.onChange} onRemoveUrl={onRemoveUrl} />
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -1,4 +1,4 @@
-import { createPropertySchema } from "@/schemas/property";
+import { propertyOnCreateSchema } from "@/schemas/property";
 
-export { createPropertySchema };
-export type { CreatePropertyInput } from "@/schemas/property";
+export { propertyOnCreateSchema as createPropertySchema };
+export type { PropertyOnCreateInput as CreatePropertyInput } from "@/schemas/property";

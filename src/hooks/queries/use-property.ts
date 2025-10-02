@@ -9,15 +9,15 @@ export const propertyQueryKey = (id: string) => ["properties", id] as const;
 function normalizePropertyData(data: any): any {
   // Cria uma cópia dos dados para não modificar o original
   const normalizedData = { ...data };
-  
+
   // Normaliza o status
   if (normalizedData.status) {
     const statusMap: Record<string, string> = {
-      'available': 'Venda',
-      'sold': 'Venda',
-      'rented': 'Aluguel',
-      'Venda': 'Venda',
-      'Aluguel': 'Aluguel'
+      available: "Venda",
+      sold: "Venda",
+      rented: "Aluguel",
+      Venda: "Venda",
+      Aluguel: "Aluguel",
     };
     normalizedData.status = statusMap[normalizedData.status] || normalizedData.status;
   }
@@ -25,32 +25,32 @@ function normalizePropertyData(data: any): any {
   // Normaliza o tipo - converte para o formato correto
   if (normalizedData.type) {
     const typeMap: Record<string, string> = {
-      'casa': 'Casa',
-      'apartamento': 'Apartamento',
-      'penthouse': 'Penthouse',
-      'cobertura': 'Cobertura',
-      'sobrado': 'Sobrado',
-      'kitnet': 'Kitnet',
-      'studio': 'Studio',
-      'terreno': 'Terreno',
-      'comercial': 'Comercial',
-      'Casa': 'Casa',
-      'Apartamento': 'Apartamento',
-      'Penthouse': 'Penthouse',
-      'Cobertura': 'Cobertura',
-      'Sobrado': 'Sobrado',
-      'Kitnet': 'Kitnet',
-      'Studio': 'Studio',
-      'Terreno': 'Terreno',
-      'Comercial': 'Comercial'
+      casa: "Casa",
+      apartamento: "Apartamento",
+      penthouse: "Penthouse",
+      cobertura: "Cobertura",
+      sobrado: "Sobrado",
+      kitnet: "Kitnet",
+      studio: "Studio",
+      terreno: "Terreno",
+      comercial: "Comercial",
+      Casa: "Casa",
+      Apartamento: "Apartamento",
+      Penthouse: "Penthouse",
+      Cobertura: "Cobertura",
+      Sobrado: "Sobrado",
+      Kitnet: "Kitnet",
+      Studio: "Studio",
+      Terreno: "Terreno",
+      Comercial: "Comercial",
     };
-    
+
     const lowerType = normalizedData.type.toLowerCase();
     normalizedData.type = typeMap[lowerType] || normalizedData.type;
   }
 
   // Garante que listedBy seja string ou undefined
-  if (normalizedData.listedBy === null || normalizedData.listedBy === '') {
+  if (normalizedData.listedBy === null || normalizedData.listedBy === "") {
     normalizedData.listedBy = undefined;
   }
 
@@ -62,7 +62,7 @@ function validateAndNormalizePropertyData(data: unknown): PropertyDTO {
   try {
     // Primeiro normaliza os dados
     const normalized = normalizePropertyData(data);
-    
+
     // Depois valida com o schema
     const validated = propertySchema.parse(normalized);
 
@@ -81,8 +81,6 @@ async function fetchProperty(id: string): Promise<PropertyDTO> {
   if (!id) {
     throw new Error("ID do imóvel não fornecido");
   }
-
-  console.log(`[${new Date().toISOString()}] Buscando imóvel com ID:`, id);
 
   try {
     const res = await fetch(`/api/properties/${id}`, {
@@ -120,7 +118,6 @@ async function fetchProperty(id: string): Promise<PropertyDTO> {
     }
 
     const data = await res.json();
-    console.log("Dados recebidos da API:", JSON.stringify(data, null, 2));
 
     // Valida e normaliza os dados antes de retornar
     return validateAndNormalizePropertyData(data);

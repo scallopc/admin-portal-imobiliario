@@ -11,7 +11,7 @@ type ImageUploadState = {
 };
 
 type UseImageUploadReturn = [
-  (files: File[] | FileList | null) => Promise<string[]>,
+  (files: File[] | FileList | null, propertyId: string) => Promise<string[]>,
   ImageUploadState,
   (urls: string[]) => Promise<void>,
   () => void
@@ -50,7 +50,8 @@ export function useImageUpload(): UseImageUploadReturn {
     }));
   }, []);
 
-  const uploadImages = useCallback(async (files: File[] | FileList | null): Promise<string[]> => {
+  const uploadImages = useCallback(
+    async (files: File[] | FileList | null, propertyId: string): Promise<string[]> => {
     if (!files || (Array.isArray(files) && files.length === 0)) {
       return [];
     }
@@ -68,6 +69,7 @@ export function useImageUpload(): UseImageUploadReturn {
       }));
 
       const formData = new FormData();
+      formData.append('propertyId', propertyId);
       fileArray.forEach((file, index) => {
         formData.append(`file${index}`, file);
       });

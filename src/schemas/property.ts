@@ -26,8 +26,8 @@ export const propertyBaseSchema = z.object({
   suiteDetails: z.string().optional(),
   parkingSpaces: z.number().optional(),
   features: z.array(z.string()).min(1, "Mínimo de 1 característica é obrigatória"),
-  images: z.array(z.string()).min(1, "Imagens são obrigatórias"),
-  floorPlans: z.array(z.string()).optional(),
+  images: z.array(z.union([z.string().url(), z.instanceof(File)])).optional(),
+  floorPlans: z.array(z.union([z.string().url(), z.instanceof(File)])).optional(),
   videoUrl: z.string().url().optional().or(z.literal("")),
   virtualTourUrl: z.string().url().optional().or(z.literal("")),
   seo: z.string().optional(),
@@ -51,8 +51,8 @@ export const propertySchema = z.object({
   suiteDetails: z.string().optional(),
   parkingSpaces: z.number().optional(),
   features: z.array(z.string()).min(1, "Mínimo de 1 característica é obrigatória"),
-  images: z.array(z.string()).min(1, "Imagens são obrigatórias"),
-  floorPlans: z.array(z.string()).optional(),
+  images: z.array(z.union([z.string().url(), z.instanceof(File)])).optional(),
+  floorPlans: z.array(z.union([z.string().url(), z.instanceof(File)])).optional(),
   videoUrl: z.string().url().optional().or(z.literal("")),
   virtualTourUrl: z.string().url().optional().or(z.literal("")),
   seo: z.string().optional(),
@@ -64,6 +64,9 @@ export const createPropertySchema = propertyBaseSchema.extend({
   address: addressSchema,
 });
 
+export const propertyOnCreateSchema = propertyBaseSchema.omit({ images: true, floorPlans: true });
+
 export type Address = z.infer<typeof addressSchema>;
 export type Property = z.infer<typeof propertySchema>;
 export type CreatePropertyInput = z.infer<typeof createPropertySchema>;
+export type PropertyOnCreateInput = z.infer<typeof propertyOnCreateSchema>;
