@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation"
 import { MigrateDataButton } from "@/components/common/migrate-data-button"
 import { ExportButton } from "@/components/common/export-button"
 import { useLeads } from "@/hooks/queries/use-leads"
-import { useExportLeads } from "@/hooks/use-export-leads"
+import { useExportLeads } from "@/hooks/queries/use-export-leads"
 
 export default function LeadsClient() {
   const router = useRouter()

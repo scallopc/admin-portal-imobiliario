@@ -4,7 +4,7 @@ export const propertyListItemSchema = z.object({
   id: z.string(),
   code: z.string().default(""),
   title: z.string().default(""),
-  type: z.enum(["Casa", "Apartamento", "Terreno", "Comercial"]).default("Casa"),
+  type: z.enum(["Casa", "Casa em condomínio", "Apartamento", "Terreno", "Comercial", "Penthouse", "Cobertura", "Sobrado", "Kitnet", "Studio"]).default("Casa"),
   status: z.enum(["Venda", "Aluguel"]).optional(),
   bedrooms: z.number().optional().default(0),
   bathrooms: z.number().optional().default(0),

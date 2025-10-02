@@ -1,6 +1,6 @@
 "use client"
 
-import PropertyForm, { type PropertyFormData } from "@/app/property/components/property-form"
+import PropertyForm, { type PropertyFormValues } from "@/app/property/components/property-form"
 import { useCreateProperty } from "@/hooks/mutations/use-create-property"
 import { toast } from "sonner"
 import Title from "@/components/common/title"
@@ -8,7 +8,7 @@ import Title from "@/components/common/title"
 export default function NewPropertyPage() {
   const { mutateAsync, isPending } = useCreateProperty()
 
-  async function handleSubmit(data: PropertyFormData) {
+  async function handleSubmit(data: PropertyFormValues) {
     try {
       const res = await mutateAsync(data)
       toast.success("Imóvel atualizado com sucesso")
@@ -28,7 +28,7 @@ export default function NewPropertyPage() {
   return (
     <div className="flex flex-col gap-6 p-6 md:p-8">
       <Title title="Novo Imóvel" subtitle="Adicione um novo imóvel" />
-      <PropertyForm onSubmit={handleSubmit} isSubmitting={isPending} resetOnSuccess />
+      <PropertyForm onSubmit={handleSubmit} isSubmitting={isPending} />
     </div>
   )
 }

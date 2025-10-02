@@ -2,7 +2,7 @@
 
 import { Home, Menu, X } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import React, { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -23,10 +23,22 @@ export default function Header() {
     const pathname = usePathname();
     const router = useRouter();
     const queryClient = useQueryClient();
+
+    // Memoize the initials calculation
+    const userInitials = React.useMemo(() => {
+        if (!user?.name) return 'U'
+        return user.name
+            .split(' ')
+            .map(word => word.charAt(0))
+            .join('')
+            .toUpperCase()
+            .slice(0, 2)
+    }, [user?.name])
     const navItems = [
         { label: "Dashboard", href: "/" },
         { label: "Leads", href: "/leads" },
         { label: "Imóveis", href: "/property" },
+        { label: "Lançamentos", href: "/releases" },
     ];
 
     const toggleMenu = () => {
@@ -44,14 +56,6 @@ export default function Header() {
         }
     };
 
-    const getInitials = (name: string) => {
-        return name
-            .split(' ')
-            .map(word => word.charAt(0))
-            .join('')
-            .toUpperCase()
-            .slice(0, 2)
-    }
 
     return (
         <header className="relative top-0 left-0 right-0 z-50">
@@ -82,7 +86,7 @@ export default function Header() {
                                 <button aria-label="Abrir menu do usuário" className="inline-flex items-center focus:outline-none cursor-pointer">
                                     <Avatar className="h-9 w-9 ring-1 ring-gold/40 bg-[#F2C791] text-[#1a1510] ">
                                         <AvatarImage src="" alt={user?.name} />
-                                        <AvatarFallback className="text-sm font-semibold">{user?.name ? getInitials(user.name) : 'U'}</AvatarFallback>
+                                        <AvatarFallback className="text-sm font-semibold">{userInitials}</AvatarFallback>
                                     </Avatar>
                                 </button>
                             </DropdownMenuTrigger>

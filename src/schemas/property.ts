@@ -1,64 +1,69 @@
 import { z } from "zod";
 
-export const coordinatesSchema = z.object({
-  lat: z.number(),
-  lng: z.number(),
-}).optional();
-
 export const addressSchema = z.object({
+  city: z.string().min(1, "Cidade é obrigatória"),
   street: z.string().optional(),
+  neighborhood: z.string().min(1, "Bairro é obrigatório"),
   number: z.string().optional(),
-  neighborhood: z.string().optional(),
-  city: z.string().optional(),
   state: z.string().optional(),
-  zipCode: z.string().optional().refine((val) => !val || val.length === 9, "CEP deve ter 9 caracteres").refine((val) => !val || /^\d{5}-\d{3}$/.test(val), "Formato de CEP inválido"),
-  country: z.string().default("Brasil"),
+  zipCode: z.string().optional(),
+  country: z.string().optional(),
 });
 
-export const propertyBaseSchema = {
-  code: z.string().optional(),
-  title: z.string().min(1, "O título é obrigatório"),
-  description: z.string().optional(),
-  type: z.enum(["Casa", "Apartamento", "Terreno", "Comercial", "Penthouse", "Cobertura", "Sobrado", "Kitnet", "Studio"]).optional(),
-  status: z.enum(["Venda", "Aluguel", "available", "sold", "rented"]).optional(),
-  price: z.number().nonnegative("O preço não pode ser negativo").optional(),
-  currency: z.string().default("BRL"),
-  area: z.number().nonnegative("A área não pode ser negativa").optional(),
-  bedrooms: z.number().int("O número de quartos deve ser um número inteiro")
-    .nonnegative("O número de quartos não pode ser negativo").optional(),
-  bathrooms: z.number().int("O número de banheiros deve ser um número inteiro")
-    .nonnegative("O número de banheiros não pode ser negativo").optional(),
-  suites: z.number().int("O número de suítes deve ser um número inteiro")
-    .nonnegative("O número de suítes não pode ser negativo")
-    .default(0).optional(),
-  parkingSpaces: z.number().int("O número de vagas deve ser um número inteiro")
-    .nonnegative("O número de vagas não pode ser negativo")
-    .default(0).optional(),
-  furnished: z.boolean().default(false),
-  address: addressSchema.optional(),
-  coordinates: coordinatesSchema.optional(),
-  features: z.array(z.string()).default([]),
-  images: z.array(z.string()).default([]),
-  videos: z.array(z.string()).default([]),
-  keywords: z.array(z.string()).default([]),
-  listedBy: z.string().optional(),
-};
-
-export const createPropertySchema = z.object({
-  ...propertyBaseSchema,
-  // Campos específicos da criação podem ser adicionados aqui
+export const propertyBaseSchema = z.object({
+  title: z.string().min(1, "Título é obrigatório"),
+  slug: z.string().min(1, "Slug é obrigatório"),
+  description: z.string().min(1, "Descrição é obrigatória"),
+  propertyType: z.string().min(1, "Tipo de imóvel é obrigatório"),
+  status: z.string().min(1, "Status é obrigatório"),
+  price: z.string().min(1, "Preço é obrigatório"),
+  totalArea: z.number().optional(),
+  privateArea: z.number().min(0, "Área privativa é obrigatória"),
+  usefulArea: z.number().min(0, "Área útil é obrigatória"),
+  bedrooms: z.number().min(0, "Número de dormitórios é obrigatório"),
+  bathrooms: z.number().min(0, "Número de banheiros é obrigatório"),
+  suites: z.number().min(0, "Número de suítes é obrigatório"),
+  suiteDetails: z.string().optional(),
+  parkingSpaces: z.number().optional(),
+  features: z.array(z.string()).min(1, "Mínimo de 1 característica é obrigatória"),
+  images: z.array(z.string()).min(1, "Imagens são obrigatórias"),
+  floorPlans: z.array(z.string()).optional(),
+  videoUrl: z.string().url().optional().or(z.literal("")),
+  virtualTourUrl: z.string().url().optional().or(z.literal("")),
+  seo: z.string().optional(),
+  furnished: z.boolean().optional(),
+  address: addressSchema,
 });
 
-export const updatePropertySchema = z.object({
-  ...propertyBaseSchema,
-  // Todos os campos são opcionais na atualização
-}).partial();
+export const propertySchema = z.object({
+  title: z.string().min(1, "Título é obrigatório"),
+  slug: z.string().min(1, "Slug é obrigatório"),
+  description: z.string().min(1, "Descrição é obrigatória"),
+  propertyType: z.string().min(1, "Tipo de imóvel é obrigatório"),
+  status: z.string().min(1, "Status é obrigatório"),
+  price: z.string().min(1, "Preço é obrigatório"),
+  totalArea: z.number().min(0, "Área total é obrigatória"),
+  privateArea: z.number().optional(),
+  usefulArea: z.number().optional(),
+  bedrooms: z.number().optional(),
+  bathrooms: z.number().optional(),
+  suites: z.number().optional(),
+  suiteDetails: z.string().optional(),
+  parkingSpaces: z.number().optional(),
+  features: z.array(z.string()).min(1, "Mínimo de 1 característica é obrigatória"),
+  images: z.array(z.string()).min(1, "Imagens são obrigatórias"),
+  floorPlans: z.array(z.string()).optional(),
+  videoUrl: z.string().url().optional().or(z.literal("")),
+  virtualTourUrl: z.string().url().optional().or(z.literal("")),
+  seo: z.string().optional(),
+  furnished: z.boolean().optional(),
+  address: addressSchema,
+});
 
-export const propertySchema = z.object(propertyBaseSchema);
+export const createPropertySchema = propertyBaseSchema.extend({
+  address: addressSchema,
+});
 
-// Tipos
-export type PropertyInput = z.infer<typeof propertySchema>;
+export type Address = z.infer<typeof addressSchema>;
+export type Property = z.infer<typeof propertySchema>;
 export type CreatePropertyInput = z.infer<typeof createPropertySchema>;
-export type UpdatePropertyInput = z.infer<typeof updatePropertySchema>;
-export type AddressInput = z.infer<typeof addressSchema>;
-export type CoordinatesInput = z.infer<typeof coordinatesSchema>;

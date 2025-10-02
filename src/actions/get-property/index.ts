@@ -5,7 +5,6 @@ import { getPropertyParamsSchema, propertySchema, type PropertyDTO } from "./sch
 
 // Função para migrar valores antigos para novos
 function migratePropertyData(data: any) {
-  // Mapeamento de valores antigos para novos
   const typeMapping: Record<string, string> = {
     'house': 'Casa',
     'apartment': 'Apartamento',
@@ -19,7 +18,9 @@ function migratePropertyData(data: any) {
     'cobertura': 'Cobertura',
     'sobrado': 'Sobrado',
     'kitnet': 'Kitnet',
-    'studio': 'Studio'
+    'studio': 'Studio',
+    'casa em condomínio': 'Casa em condomínio',
+    'casa-condominio': 'Casa em condomínio',
   }
 
   const statusMapping: Record<string, string> = {
@@ -27,15 +28,42 @@ function migratePropertyData(data: any) {
     'for_rent': 'Aluguel',
     'venda': 'Venda',
     'aluguel': 'Aluguel',
+    'lançamento': 'Lançamento',
+    'lancamento': 'Lançamento',
     'available': 'Venda',
     'sold': 'Venda',
-    'rented': 'Aluguel'
+    'rented': 'Aluguel',
   }
+
+  const features = Array.isArray(data?.features)
+    ? data.features
+    : typeof data?.features === 'string'
+      ? data.features.split(',').map((s: string) => s.trim()).filter(Boolean)
+      : []
+
+  const totalArea = data?.totalArea ?? data?.area_total ?? data?.area ?? undefined
+  const privateArea = data?.privateArea ?? data?.area_privativa ?? undefined
+  const usefulArea = data?.usefulArea ?? data?.area_util ?? undefined
+
+  const videoUrl = data?.videoUrl ?? data?.video_url ?? ''
+  const virtualTourUrl = data?.virtualTourUrl ?? data?.tour_virtual_url ?? ''
+  const estimatedPrice = data?.estimatedPrice ?? data?.preco_aproximado ?? ''
+  const suiteDetails = data?.suiteDetails ?? data?.detalhes_suite ?? ''
+  const layout = data?.layout ?? data?.tipo_layout ?? undefined
 
   return {
     ...data,
-    type: typeMapping[data.type] || data.type || 'Casa',
-    status: statusMapping[data.status] || data.status || 'Venda'
+    type: typeMapping[String(data?.type || '').toLowerCase()] || data?.type || 'Casa',
+    status: statusMapping[String(data?.status || '').toLowerCase()] || data?.status || 'Venda',
+    features,
+    totalArea,
+    privateArea,
+    usefulArea,
+    videoUrl,
+    virtualTourUrl,
+    estimatedPrice,
+    suiteDetails,
+    layout,
   }
 }
 

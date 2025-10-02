@@ -5,6 +5,19 @@ function isPublicPath(pathname: string): boolean {
   const publicPaths = [
     "/authentication",
     "/api/auth/sign-in",
+    "/api/ai", // Permitir todas as rotas de IA
+    "/api/releases", // Permitir todas as rotas de releases
+    "/api/leads", // Permitir todas as rotas de leads
+    "/api/links", // Permitir todas as rotas de links
+    "/api/properties", // Permitir todas as rotas de properties
+    "/api/dashboard", // Permitir dashboard
+    "/api/cep", // Permitir CEP
+    "/api/email", // Permitir email
+    "/api/upload", // Permitir upload
+    "/api/tools", // Permitir tools
+    "/api/delete", // Permitir delete
+    "/api/migrate", // Permitir migrate
+    "/api/pdf", // Permitir PDF
     "/_next",
     "/favicon.ico",
     "/images",
@@ -51,6 +64,6 @@ export function middleware(req: NextRequest) {
 export const config = {
   matcher: [
     // Proteger todas as rotas exceto as especificadas
-    "/((?!_next/static|_next/image|favicon.ico|authentication|images|public|.*\\.).*)",
+    "/((?!_next/static|_next/image|favicon.ico|authentication|images|public|api|.*\\.).*)",
   ],
 };

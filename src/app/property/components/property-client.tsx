@@ -5,13 +5,9 @@ import PropertyTable from "./property-table"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { MigrateDataButton } from "@/components/common/migrate-data-button"
-import { ExportButton } from "@/components/common/export-button"
-import { UploadButton } from "@/components/common/upload-button"
-import { UploadInstructions } from "@/components/common/upload-instructions"
 import { useProperties } from "@/hooks/queries/use-properties"
-import { useExportProperties } from "@/hooks/use-export-properties"
-import { useFileUpload } from "@/hooks/use-file-upload"
+import { useExportProperties } from "@/hooks/queries/use-export-properties"
+import { useFileUpload } from "@/hooks/queries/use-file-upload"
 
 export default function PropertyClient() {
   const router = useRouter()
@@ -34,7 +30,7 @@ export default function PropertyClient() {
           </Button>
         </div>
       </div>
-        <div className="flex gap-2 justify-end">
+        {/*<div className="flex gap-2 justify-end">
           <UploadButton 
             onUpload={handleFileUpload}
             isLoading={isUploading}
@@ -44,7 +40,8 @@ export default function PropertyClient() {
             isLoading={isLoading}
             disabled={properties.length === 0}
           />
-        </div>
+        </div>*/}
+      
       <PropertyTable />
     </div>
   )

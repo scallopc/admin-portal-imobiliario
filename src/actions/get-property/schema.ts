@@ -1,15 +1,13 @@
 import { z } from "zod";
-import { propertyBaseSchema, coordinatesSchema, addressSchema } from "@/schemas/property";
+import { propertyBaseSchema, addressSchema } from "@/schemas/property";
 
 export const getPropertyParamsSchema = z.object({ id: z.string() });
 
-export { coordinatesSchema, addressSchema };
+export { addressSchema };
 
-export const propertySchema = z.object({
+export const propertySchema = propertyBaseSchema.extend({
   id: z.string(),
-  ...propertyBaseSchema,
   address: addressSchema.optional(),
-  coordinates: coordinatesSchema.optional(),
   // Adiciona campos específicos de resposta
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),

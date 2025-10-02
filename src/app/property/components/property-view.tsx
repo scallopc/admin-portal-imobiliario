@@ -46,14 +46,7 @@ const statusLabels = {
   available: "Disponível",
   sold: "Vendido",
   rented: "Alugado",
-};
-
-const statusColors = {
-  venda: "bg-green-100 text-green-800",
-  aluguel: "bg-blue-100 text-blue-800",
-  available: "bg-yellow-100 text-yellow-800",
-  sold: "bg-green-100 text-green-800",
-  rented: "bg-blue-100 text-blue-800",
+  lançamento: "Lançamento",
 };
 
 const typeColors = {
@@ -65,6 +58,7 @@ const typeColors = {
   "Kitnet": "bg-cyan-100 text-cyan-800",
   "Studio": "bg-teal-100 text-teal-800",
   "Terreno": "bg-brown-100 text-brown-800",
+  "Casa em condomínio": "bg-lime-100 text-lime-800",
   "Comercial": "bg-gray-100 text-gray-800",
 };
 
@@ -74,7 +68,7 @@ export function PropertyView({ propertyId, open, onOpenChange }: PropertyViewPro
   if (isLoading) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-h-[80vh] max-w-4xl overflow-y-auto m-1">
+        <DialogContent className="max-h-[90vh] w-[95vw] max-w-7xl overflow-y-auto m-1">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Home className="h-5 w-5" />
@@ -95,7 +89,7 @@ export function PropertyView({ propertyId, open, onOpenChange }: PropertyViewPro
   if (error || !property) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-h-[80vh] max-w-4xl overflow-y-auto m-1">
+        <DialogContent className="max-h-[90vh] w-[95vw] max-w-7xl overflow-y-auto m-1">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Home className="h-5 w-5" />
@@ -142,9 +136,9 @@ export function PropertyView({ propertyId, open, onOpenChange }: PropertyViewPro
 
             <CardContent className="space-y-3 sm:space-y-4">
               <div className="grid grid-cols-1 gap-3 sm:gap-4">
-      
-                  <label className="text-muted-foreground text-xs sm:text-sm font-medium">Título</label>
-                  <p className="text-sm sm:text-lg font-semibold">{property.title}</p>
+
+                <label className="text-muted-foreground text-xs sm:text-sm font-medium">Título</label>
+                <p className="text-sm sm:text-lg font-semibold">{property.title}</p>
               </div>
 
               <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
@@ -152,6 +146,12 @@ export function PropertyView({ propertyId, open, onOpenChange }: PropertyViewPro
                   <label className="text-muted-foreground text-xs sm:text-sm font-medium">Tipo</label>
                   <p className="text-sm sm:text-base">{property.type || "—"}</p>
                 </div>
+                {property.layout && (
+                  <div>
+                    <label className="text-muted-foreground text-xs sm:text-sm font-medium">Layout</label>
+                    <p className="text-sm sm:text-base">{property.layout}</p>
+                  </div>
+                )}
                 <div>
                   <label className="text-muted-foreground text-xs sm:text-sm font-medium">Status</label>
                   <p className="text-sm sm:text-base">
@@ -167,42 +167,37 @@ export function PropertyView({ propertyId, open, onOpenChange }: PropertyViewPro
                 </div>
               )}
 
-              {property.keywords && property.keywords.length > 0 && (
+              {property.seo && (
                 <div>
-                  <label className="text-muted-foreground text-xs sm:text-sm font-medium">Palavras-chave (SEO)</label>
-                  <div className="mt-1 flex flex-wrap gap-1.5 sm:gap-2">
-                    {property.keywords.map((keyword, index) => (
-                      <span
-                        key={index}
-                        className="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-                      >
-                        {keyword}
-                      </span>
-                    ))}
-                  </div>
+                  <label className="text-muted-foreground text-xs sm:text-sm font-medium">Meta Description (SEO)</label>
+                  <p className="mt-1 text-sm sm:text-base whitespace-pre-wrap">{property.seo}</p>
                 </div>
               )}
             </CardContent>
           </Card>
 
           {/* Preço e Área */}
-          {(property.price || property.area) && (
+          {(property.price || property.estimatedPrice || property.totalArea || property.privateArea || property.usefulArea) && (
             <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
-              {property.price && (
+              {(property.price || property.estimatedPrice) && (
                 <Card>
                   <CardHeader className="pb-2 sm:pb-4">
                     <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                       <DollarSign className="h-4 w-4 sm:h-5 sm:w-5" />
-                      Preço
+                      {property.status === "Lançamento" ? "Preço (Estimado)" : "Preço"}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-0">
-                    <p className="text-primary text-lg sm:text-2xl font-bold">{formatPrice(property.price, property.currency)}</p>
+                    <p className="text-primary text-lg sm:text-2xl font-bold">
+                      {property.status === "Lançamento"
+                        ? property.estimatedPrice
+                        : formatPrice(property.price!, property.currency)}
+                    </p>
                   </CardContent>
                 </Card>
               )}
 
-              {property.area && (
+              {(property.totalArea || property.privateArea || property.usefulArea) && (
                 <Card>
                   <CardHeader className="pb-2 sm:pb-4">
                     <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
@@ -210,8 +205,10 @@ export function PropertyView({ propertyId, open, onOpenChange }: PropertyViewPro
                       Área
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="pt-0">
-                    <p className="text-lg sm:text-2xl font-bold">{formatArea(property.area)}</p>
+                  <CardContent className="pt-0 space-y-2">
+                    {property.totalArea && <p className="text-sm"><span className="font-semibold">Total:</span> {formatArea(property.totalArea)}</p>}
+                    {property.privateArea && <p className="text-sm"><span className="font-semibold">Privativa:</span> {formatArea(property.privateArea)}</p>}
+                    {property.usefulArea && <p className="text-sm"><span className="font-semibold">Útil:</span> {formatArea(property.usefulArea)}</p>}
                   </CardContent>
                 </Card>
               )}
@@ -250,7 +247,10 @@ export function PropertyView({ propertyId, open, onOpenChange }: PropertyViewPro
                         <Star className="text-muted-foreground h-3.5 w-3.5 sm:h-4 sm:w-4" />
                         <p className="text-muted-foreground text-xs sm:text-sm">Suítes</p>
                       </div>
-                      <p className="font-semibold text-sm sm:text-base">{property.suites}</p>
+                      <p className="font-semibold text-sm sm:text-base">
+                        {property.suites}
+                        {property.suiteDetails && <span className="text-xs text-muted-foreground ml-1">({property.suiteDetails})</span>}
+                      </p>
                     </div>
                   )}
                   {property.parkingSpaces !== undefined && (
@@ -338,22 +338,25 @@ export function PropertyView({ propertyId, open, onOpenChange }: PropertyViewPro
               </Card>
             )}
 
-            {property.videos && property.videos.length > 0 && (
+            {(property.videoUrl || property.virtualTourUrl) && (
               <Card>
                 <CardHeader className="pb-2 sm:pb-4">
                   <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                     <Video className="h-4 w-4 sm:h-5 sm:w-5" />
-                    Vídeos ({property.videos.length})
+                    Mídia Adicional
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="space-y-1.5 sm:space-y-2">
-                    {property.videos.map((video, index) => (
-                      <div key={index} className="text-muted-foreground text-xs sm:text-sm">
-                        Vídeo {index + 1}: {video}
-                      </div>
-                    ))}
-                  </div>
+                <CardContent className="pt-0 space-y-2">
+                  {property.videoUrl && (
+                    <a href={property.videoUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm flex items-center gap-2">
+                      Assistir Vídeo
+                    </a>
+                  )}
+                  {property.virtualTourUrl && (
+                    <a href={property.virtualTourUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm flex items-center gap-2">
+                      Ver Tour Virtual
+                    </a>
+                  )}
                 </CardContent>
               </Card>
             )}
@@ -362,42 +365,42 @@ export function PropertyView({ propertyId, open, onOpenChange }: PropertyViewPro
           {/* Datas */}
           <Card>
             <CardContent className="space-y-2 pt-4 sm:pt-6">
-                <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
-              <div className="flex flex-col gap-1.5 sm:gap-2">
-                <div className="flex items-center gap-1.5 sm:gap-2">
-                  <Calendar className="text-muted-foreground h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  <label className="text-muted-foreground text-xs sm:text-sm font-medium">Criado em</label>
-                </div>
-                <p className="text-sm sm:text-base">
-                  {property.createdAt
-                    ? new Date(property.createdAt).toLocaleDateString("pt-BR", {
+              <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
+                <div className="flex flex-col gap-1.5 sm:gap-2">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <Calendar className="text-muted-foreground h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    <label className="text-muted-foreground text-xs sm:text-sm font-medium">Criado em</label>
+                  </div>
+                  <p className="text-sm sm:text-base">
+                    {property.createdAt
+                      ? new Date(property.createdAt).toLocaleDateString("pt-BR", {
                         day: "2-digit",
                         month: "2-digit",
                         year: "numeric",
                         hour: "2-digit",
                         minute: "2-digit",
                       })
-                    : "—"}
-                </p>
-              </div>
-              <div className="flex flex-col gap-1.5 sm:gap-2">
-                <div className="flex items-center gap-1.5 sm:gap-2">
-                  <Calendar className="text-muted-foreground h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  <label className="text-muted-foreground text-xs sm:text-sm font-medium">Atualizado em</label>
+                      : "—"}
+                  </p>
                 </div>
-                <p className="text-sm sm:text-base">
-                  {property.updatedAt
-                    ? new Date(property.updatedAt).toLocaleDateString("pt-BR", {
+                <div className="flex flex-col gap-1.5 sm:gap-2">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <Calendar className="text-muted-foreground h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    <label className="text-muted-foreground text-xs sm:text-sm font-medium">Atualizado em</label>
+                  </div>
+                  <p className="text-sm sm:text-base">
+                    {property.updatedAt
+                      ? new Date(property.updatedAt).toLocaleDateString("pt-BR", {
                         day: "2-digit",
                         month: "2-digit",
                         year: "numeric",
                         hour: "2-digit",
                         minute: "2-digit",
                       })
-                    : "—"}
-                </p>
+                      : "—"}
+                  </p>
+                </div>
               </div>
-            </div>
             </CardContent>
           </Card>
         </div>

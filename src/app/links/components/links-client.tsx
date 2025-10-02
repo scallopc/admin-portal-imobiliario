@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation"
 import { useTransition } from "react"
 import { ExportButton } from "@/components/common/export-button"
 import { useLinks } from "@/hooks/queries/use-links"
-import { useExportLinks } from "@/hooks/use-export-links"
+import { useExportLinks } from "@/hooks/queries/use-export-links"
 
 export default function LinksClient() {
   const router = useRouter()

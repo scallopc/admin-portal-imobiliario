@@ -5,17 +5,16 @@ import { useDropzone, type DropzoneOptions, type FileRejection } from "react-dro
 import { Button } from "@/components/ui/button"
 import { X, Upload, Loader2, Maximize2, CheckCircle2, AlertCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useImageUpload } from "@/hooks/use-image-upload"
+import { useImageUpload } from "@/hooks/queries/use-image-upload"
 import { Progress } from "@/components/ui/progress"
 
 type ImageUploadProps = {
   value: string[]
   onChange: (value: string[]) => void
-  maxFiles?: number
   className?: string
 }
 
-export function ImageUpload({ value = [], onChange, maxFiles = 20, className }: ImageUploadProps) {
+export function ImageUpload({ value = [], onChange, className }: ImageUploadProps) {
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null)
   const [isAnimating, setIsAnimating] = useState<number | null>(null)
   const prevValueRef = useRef<string[]>(value)
@@ -87,10 +86,6 @@ export function ImageUpload({ value = [], onChange, maxFiles = 20, className }: 
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
-      if (value.length + acceptedFiles.length > maxFiles) {
-        alert(`Você só pode enviar no máximo ${maxFiles} imagens.`)
-        return
-      }
 
       try {
         const uploadedUrls = await handleUpload(acceptedFiles)
@@ -102,7 +97,7 @@ export function ImageUpload({ value = [], onChange, maxFiles = 20, className }: 
         console.error('Erro ao fazer upload das imagens:', error)
       }
     },
-    [value, maxFiles, onChange, handleUpload]
+    [value, onChange, handleUpload]
   )
 
   const { getRootProps, getInputProps, isDragActive, fileRejections } = useDropzone({
@@ -112,9 +107,8 @@ export function ImageUpload({ value = [], onChange, maxFiles = 20, className }: 
       'image/png': ['.png'],
       'image/webp': ['.webp']
     },
-    maxFiles: maxFiles - value.length,
     maxSize: 10 * 1024 * 1024, // 10MB
-    disabled: uploadState.isUploading || value.length >= maxFiles,
+    disabled: uploadState.isUploading,
   })
 
   const removeImage = async (index: number) => {
@@ -145,11 +139,11 @@ export function ImageUpload({ value = [], onChange, maxFiles = 20, className }: 
         className={cn(
           "border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors",
           isDragActive ? "border-primary bg-primary/10" : "border-muted-foreground/25 hover:border-muted-foreground/50",
-          (uploadState.isUploading || value.length >= maxFiles) && "opacity-50 cursor-not-allowed"
+          uploadState.isUploading && "opacity-50 cursor-not-allowed"
         )}
-        aria-disabled={uploadState.isUploading || value.length >= maxFiles}
+        aria-disabled={uploadState.isUploading}
       >
-        <input {...getInputProps()} disabled={uploadState.isUploading || value.length >= maxFiles} />
+        <input {...getInputProps()} disabled={uploadState.isUploading} />
         <div className="flex flex-col items-center justify-center space-y-4">
           {uploadState.isUploading ? (
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -171,10 +165,6 @@ export function ImageUpload({ value = [], onChange, maxFiles = 20, className }: 
                 Formatos suportados: JPG, PNG, WEBP (máx. 10MB)
               </p>
             )}
-            
-            <p className="text-xs text-muted-foreground">
-              {value.length}/{maxFiles} imagens
-            </p>
             
             {statusMessage && (
               <div className="mt-2">

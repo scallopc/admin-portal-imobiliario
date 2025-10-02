@@ -5,7 +5,7 @@ export const importPropertiesSchema = z.object({
     code: z.string().optional(),
     title: z.string().min(1, "O título é obrigatório"),
     description: z.string().optional(),
-    type: z.enum(["Casa", "Apartamento", "Terreno", "Comercial", "Penthouse", "Cobertura", "Sobrado", "Kitnet", "Studio"]).optional(),
+    type: z.enum(["Casa", "Casa em condomínio", "Apartamento", "Terreno", "Comercial", "Penthouse", "Cobertura", "Sobrado", "Kitnet", "Studio"]).optional(),
     status: z.enum(["Venda", "Aluguel", "available", "sold", "rented"]).optional(),
     price: z.number().nonnegative("O preço não pode ser negativo").optional(),
     currency: z.string().default("BRL"),
@@ -31,7 +31,7 @@ export const importPropertiesSchema = z.object({
     features: z.array(z.string()).default([]),
     images: z.array(z.string()).default([]),
     videos: z.array(z.string()).default([]),
-    keywords: z.array(z.string()).default([]),
+    seo: z.string().max(160, "SEO deve ter no máximo 160 caracteres").optional(),
   }))
 })
 

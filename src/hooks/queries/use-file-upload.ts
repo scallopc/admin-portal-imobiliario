@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { parseFile } from '@/lib/excel-parser'
-import { useImportProperties } from './mutations/use-import-properties'
+import { useImportProperties } from '../mutations/use-import-properties'
 import { toast } from 'sonner'
 
 export function useFileUpload() {

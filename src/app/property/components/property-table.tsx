@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/common/data-table"
-import { PenSquare, Trash, Eye } from "lucide-react"
+import { PenSquare, Trash } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useProperties } from "@/hooks/queries/use-properties"
@@ -78,14 +78,6 @@ export default function PropertyTable() {
             sortable: false,
             cell: (row: PropertyListItem) => (
               <div className="flex gap-2">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleView(row)}
-                >
-                  <Eye className="h-5 w-5 text-blue-400" />
-                </Button>
                 <Button
                   type="button"
                   variant="ghost"

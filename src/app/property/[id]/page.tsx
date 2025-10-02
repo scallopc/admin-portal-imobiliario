@@ -1,12 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import PropertyForm, { type PropertyFormData } from "@/app/property/components/property-form"
 import { useProperty } from "@/hooks/queries/use-property"
 import { useUpdateProperty } from "@/hooks/mutations/use-update-property"
 import { useParams, useRouter } from "next/navigation"
-import { Loader2 } from "lucide-react"
+import { Loading } from "@/components/ui/loading"
+import { ErrorState } from "@/components/ui/error-state"
 import Title from "@/components/common/title"
+import PropertyForm, { PropertyFormValues } from "../components/property-form"
 
 export default function EditPropertyPage() {
   const params = useParams<{ id: string }>()
@@ -16,7 +17,7 @@ export default function EditPropertyPage() {
   const { data, isLoading, error: fetchError } = useProperty(id)
   const { mutateAsync, isPending } = useUpdateProperty(id)
 
-  async function handleSubmit(form: PropertyFormData) {
+  async function handleSubmit(form: PropertyFormValues) {
     setError(null)
     try {
       await mutateAsync(form)
@@ -44,18 +45,21 @@ export default function EditPropertyPage() {
   const safeBoolean = (bool: boolean | undefined, defaultValue = false): boolean =>
     typeof bool === 'boolean' ? bool : defaultValue;
 
-  const defaults: PropertyFormData | null = data ? {
+  const defaults: PropertyFormValues | null = data ? {
     title: safeString(data.title),
+    slug: safeString(data.slug),
     description: data.description || undefined,
-    type: data.type || undefined,
-    status: data.status || undefined,
-    price: data.price || undefined,
-    currency: safeString(data.currency, 'BRL'),
-    area: data.area || undefined,
-    bedrooms: data.bedrooms || undefined,
-    bathrooms: data.bathrooms || undefined,
-    suites: data.suites || undefined,
-    parkingSpaces: data.parkingSpaces || undefined,
+    propertyType: data.propertyType || undefined,
+    status: data.status || "",
+    price: data.price || 0,
+    totalArea: data.totalArea || 0,
+    privateArea: data.privateArea || 0,
+    usefulArea: data.usefulArea || 0,
+    bedrooms: data.bedrooms || 0,
+    bathrooms: data.bathrooms || 0,
+    suites: data.suites || 0,
+    suiteDetails: data.suiteDetails || "",
+    parkingSpaces: data.parkingSpaces || 0,
     furnished: safeBoolean(data.furnished),
     address: {
       street: data.address?.street || "",
@@ -66,11 +70,12 @@ export default function EditPropertyPage() {
       zipCode: data.address?.zipCode || "",
       country: safeString(data.address?.country, 'Brasil'),
     },
-    coordinates: data.coordinates || undefined,
     features: safeArray(data.features),
     images: safeArray(data.images),
-    videos: safeArray(data.videos),
-    keywords: safeArray(data.keywords)
+    floorPlans: safeArray(data.floorPlans),
+    videoUrl: data.videoUrl || "",
+    virtualTourUrl: data.virtualTourUrl || "",
+    seo: data.seo || "",
   } : null
 
   return (
@@ -78,29 +83,24 @@ export default function EditPropertyPage() {
       <Title title="Editar Imóvel" subtitle="Edite um imóvel" />
       
       {isLoading && (
-        <div className="flex items-center justify-center p-12">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <span className="ml-2">Carregando dados do imóvel...</span>
-        </div>
+        <Loading message="Carregando imóvel..." />
       )}
 
       {(fetchError || (!isLoading && !data)) && (
-        <div className="rounded-md bg-destructive/15 p-4 text-destructive">
-          <p>Não foi possível carregar os dados do imóvel.</p>
-          {fetchError && <p className="mt-2 text-sm">{String(fetchError)}</p>}
-          <button
-            onClick={() => window.location.reload()}
-            className="mt-4 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-          >
-            Tentar novamente
-          </button>
-        </div>
+        <ErrorState 
+          title="Erro ao carregar imóvel"
+          message="Não foi possível carregar os dados do imóvel."
+          error={fetchError}
+        />
       )}
 
       {error && (
-        <div className="rounded-md bg-destructive/15 p-4 text-destructive">
-          <p>{error}</p>
-        </div>
+        <ErrorState 
+          title="Erro ao salvar"
+          message="Não foi possível salvar as alterações."
+          error={error}
+          showRetry={false}
+        />
       )}
       
       {!isLoading && data && defaults && (

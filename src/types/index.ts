@@ -80,3 +80,5 @@ export interface Deal {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export type { Release } from '@/schemas/release';
