@@ -22,19 +22,23 @@ export type UpdateReleaseInput = {
   }
 }
 
-export function getUpdateReleaseMutationKey(id: string) {
-  return ['update-release', id] as const
+export function getUpdateReleaseMutationKey() {
+  return ['update-release'] as const
 }
 
-export function useUpdateRelease(id: string) {
+export function useUpdateRelease() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationKey: getUpdateReleaseMutationKey(id),
+    mutationKey: getUpdateReleaseMutationKey(),
     mutationFn: async (payload: UpdateReleaseInput) => {
+      const { id, ...rest } = payload;
+      if (!id) {
+        throw new Error('ID do lançamento é obrigatório para atualização');
+      }
       const res = await fetch(`/api/releases/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(rest),
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
@@ -42,8 +46,9 @@ export function useUpdateRelease(id: string) {
       }
       return await res.json()
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: getReleaseDetailsQueryKey(id) })
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: getReleaseDetailsQueryKey(variables.id) });
+      queryClient.invalidateQueries({ queryKey: ['releases', 'list'] }); // Invalida a lista geral também
     },
   })
 }

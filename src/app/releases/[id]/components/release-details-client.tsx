@@ -14,6 +14,7 @@ import { DataTable } from "@/components/common/data-table";
 import { formatCurrency } from "@/lib/utils";
 import Title from "@/components/common/title";
 import { useUpdateRelease } from "@/hooks/mutations/use-update-release";
+import { useImageUpload } from '@/hooks/queries/use-image-upload';
 import { defaultValues } from "@/lib/constants";
 import { ReleaseForm } from "@/components/common/release-form";
 import { Loading } from "@/components/ui/loading";
@@ -27,7 +28,8 @@ export default function ReleaseDetailsClient({ id }: Props) {
   const updateUnit = useUpdateUnit(id);
   const [editing, setEditing] = React.useState<Record<string, boolean>>({});
   const [drafts, setDrafts] = React.useState<Record<string, any>>({});
-  const updateRelease = useUpdateRelease(id);
+  const updateRelease = useUpdateRelease();
+  const [handleUpload] = useImageUpload();
 
   const onEdit = (unitId: string, row: any) => {
     setEditing(s => ({ ...s, [unitId]: true }));
@@ -56,7 +58,6 @@ export default function ReleaseDetailsClient({ id }: Props) {
           onSuccess: () => {
             toast.success("Unidade atualizada");
             onCancel(unitId);
-            router.push("/releases");
           },
           onError: (e: any) => {
             toast.error(e?.message || "Falha ao atualizar unidade");
@@ -70,26 +71,32 @@ export default function ReleaseDetailsClient({ id }: Props) {
 
   const handleReleaseSubmit = async (values: any) => {
     try {
+      const { images, floorPlans, city, neighborhood, ...rest } = values;
+
+      // Lida com upload de novas imagens
+      const existingImageUrls = (images || []).filter((i: any) => typeof i === 'string');
+      const newImageFiles = (images || []).filter((i: any) => i instanceof File);
+      let newImageUrls: string[] = [];
+      if (newImageFiles.length > 0) {
+        newImageUrls = await handleUpload(newImageFiles, id);
+      }
+
+      // Lida com upload de novas plantas
+      const existingFloorPlanUrls = (floorPlans || []).filter((i: any) => typeof i === 'string');
+      const newFloorPlanFiles = (floorPlans || []).filter((i: any) => i instanceof File);
+      let newFloorPlanUrls: string[] = [];
+      if (newFloorPlanFiles.length > 0) {
+        newFloorPlanUrls = await handleUpload(newFloorPlanFiles, id);
+      }
+
       const payload = {
         id,
-        title: values.title,
-        slug: values.slug,
-        description: values.description || "",
-        developer: values.developer || "",
-        status: values.status,
-        propertyType: values.propertyType,
-        address: {
-          street: "",
-          neighborhood: values.neighborhood || "",
-          city: values.city || "",
-        },
-        images: Array.isArray(values.images) ? values.images : [],
-        floorPlans: Array.isArray(values.floorPlans) ? values.floorPlans : [],
-        seo: values.seo,
-        features: values.features,
-        videoUrl: values.videoUrl,
-        virtualTourUrl: values.virtualTourUrl,
+        ...rest,
+        images: [...existingImageUrls, ...newImageUrls],
+        floorPlans: [...existingFloorPlanUrls, ...newFloorPlanUrls],
+        address: { city, neighborhood },
       };
+
       await updateRelease.mutateAsync(payload);
       toast.success("Empreendimento atualizado");
       router.push("/releases");

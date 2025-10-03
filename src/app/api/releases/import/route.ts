@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
       developer: body.release?.developer,
       status: body.release?.status,
       propertyType: body.release?.propertyType,
-      address: body.release?.address,
+      address: body.release?.address || { city: '', neighborhood: '' },
       images: Array.isArray(body.release?.images) ? body.release!.images : [],
       floorPlans: Array.isArray(body.release?.floorPlans) ? body.release!.floorPlans : [],
       seo: body.release?.seo,

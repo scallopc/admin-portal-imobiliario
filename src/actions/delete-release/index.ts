@@ -1,42 +1,42 @@
 'use server'
 
-import { adminDb } from '@/lib/firebase-admin'
-import { getUser } from '@/actions/get-user'
+import { adminDb } from '@/lib/firebase-admin';
+import { CloudinaryService } from '@/services/cloudinary.service';
+import { getUser } from '@/actions/get-user';
 
 export async function deleteRelease(id: string) {
   try {
-    const user = await getUser()
-    
+    const user = await getUser();
     if (!user) {
-      throw new Error('Usuário não autenticado')
+      throw new Error('Usuário não autenticado');
     }
 
-    const releaseRef = adminDb.collection('releases').doc(id)
-    const releaseDoc = await releaseRef.get()
-    
+    const releaseRef = adminDb.collection('releases').doc(id);
+    const releaseDoc = await releaseRef.get();
     if (!releaseDoc.exists) {
-      throw new Error('Lançamento não encontrado')
+      throw new Error('Lançamento não encontrado');
     }
 
-    await releaseRef.delete()
-    
+    await Promise.all([
+      releaseRef.delete(),
+      CloudinaryService.deleteFolder(id),
+    ]);
+
     return {
       success: true,
-      message: 'Lançamento excluído com sucesso'
-    }
+      message: 'Lançamento excluído com sucesso',
+    };
   } catch (error) {
-    console.error('Erro ao excluir lançamento:', error)
-    
+    console.error('Erro ao excluir lançamento:', error);
     if (error instanceof Error) {
       return {
         success: false,
-        error: error.message
-      }
+        error: error.message,
+      };
     }
-    
     return {
       success: false,
-      error: 'Erro interno do servidor'
-    }
+      error: 'Erro interno do servidor',
+    };
   }
 }
