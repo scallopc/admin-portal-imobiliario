@@ -9,7 +9,6 @@ import { useProperties } from "@/hooks/queries/use-properties"
 import { useDeleteProperty } from "@/hooks/mutations/use-delete-property"
 import { DeleteDialog } from "@/components/common/delete-dialog"
 import { PropertyListItem } from "@/actions/list-properties/schema"
-import { PropertyView } from "./property-view"
 
 export default function PropertyTable() {
   const columns = [
@@ -107,12 +106,6 @@ export default function PropertyTable() {
         isLoading={isDeleting}
         title="Excluir imóvel"
         description="Tem certeza que deseja excluir este imóvel? Esta ação não pode ser desfeita."
-      />
-
-      <PropertyView
-        propertyId={propertyToView}
-        open={viewDialogOpen}
-        onOpenChange={setViewDialogOpen}
       />
     </>
   )

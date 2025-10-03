@@ -5,7 +5,6 @@ import LeadsTable from "./leads-table"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { MigrateDataButton } from "@/components/common/migrate-data-button"
 import { ExportButton } from "@/components/common/export-button"
 import { useLeads } from "@/hooks/queries/use-leads"
 import { useExportLeads } from "@/hooks/queries/use-export-leads"
@@ -31,13 +30,13 @@ export default function LeadsClient() {
           </Button>
         </div>
       </div>
-        <div className="flex gap-2 justify-end">
-          <ExportButton 
-            onExport={handleExport} 
-            isLoading={isLoading}
-            disabled={leads.length === 0}
-          />
-        </div>
+      <div className="flex gap-2 justify-end">
+        <ExportButton
+          onExport={handleExport}
+          isLoading={isLoading}
+          disabled={leads.length === 0}
+        />
+      </div>
 
       <LeadsTable />
     </div>

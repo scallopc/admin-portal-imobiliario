@@ -63,7 +63,6 @@ export function ReleasesClient() {
           items={excelData.items}
           description={excelData.description}
           onCancel={() => setExcelData(null)}
-          onSubmit={() => setExcelData(null)}
         />
       ) : (
         <ReleasesDataTable />
