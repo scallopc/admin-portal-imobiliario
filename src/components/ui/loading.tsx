@@ -1,36 +1,17 @@
-import React from 'react'
-import { Loader2 } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import React from "react";
+import { Loader2 } from "lucide-react";
 
 interface LoadingProps {
-  message?: string
-  size?: 'sm' | 'md' | 'lg'
-  className?: string
-  centered?: boolean
+  message?: string;
 }
 
-export function Loading({
-  message = "Carregando dados...",
-  size = 'md',
-  className,
-  centered = true
-}: LoadingProps) {
-  const sizeClasses = {
-    sm: 'h-4 w-4',
-    md: 'h-8 w-8',
-    lg: 'h-12 w-12'
-  }
-
-  const containerClasses = centered 
-    ? "flex items-center justify-center p-12"
-    : "flex items-center p-4"
-
+export function Loading({ message = "Carregando..." }: LoadingProps) {
   return (
-    <div className={cn(containerClasses, className)}>
-      <Loader2 className={cn("animate-spin text-primary", sizeClasses[size])} />
-      {message && (
-        <span className="ml-2">{message}</span>
-      )}
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+      <div className="border-gold/30 flex flex-row items-center gap-4 rounded-2xl border bg-[#1a1510] p-8 shadow-2xl">
+        <Loader2 className="text-gold h-8 w-8 animate-spin" />
+        {message && <span className="text-primary-clean font-semibold">{message}</span>}
+      </div>
     </div>
-  )
+  );
 }

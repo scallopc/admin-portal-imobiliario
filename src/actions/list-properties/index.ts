@@ -2,34 +2,7 @@
 
 import { adminDb } from "@/lib/firebase-admin";
 import { listPropertiesResponseSchema, type PropertyListItem } from "./schema";
-
-// Função para migrar valores antigos para novos
-function migratePropertyData(data: any) {
-  // Mapeamento de valores antigos para novos
-  const typeMapping: Record<string, string> = {
-    'house': 'Casa',
-    'apartment': 'Apartamento',
-    'land': 'Terreno',
-    'commercial': 'Comercial',
-    'casa': 'Casa',
-    'apartamento': 'Apartamento',
-    'terreno': 'Terreno',
-    'comercial': 'Comercial'
-  }
-
-  const statusMapping: Record<string, string> = {
-    'for_sale': 'Venda',
-    'for_rent': 'Aluguel',
-    'venda': 'Venda',
-    'aluguel': 'Aluguel'
-  }
-
-  return {
-    ...data,
-    type: typeMapping[data.type] || data.type || 'Casa',
-    status: statusMapping[data.status] || data.status
-  }
-}
+import { propertyTypes, statusProperty } from "@/lib/constants";
 
 export async function listProperties(): Promise<PropertyListItem[]> {
   try {
@@ -37,17 +10,13 @@ export async function listProperties(): Promise<PropertyListItem[]> {
     const data = snapshot.docs.map(doc => {
       try {
         const d = doc.data() as any;
-        const migratedData = migratePropertyData(d);
+        const migratedData = d;
         const updatedAt = migratedData.updatedAt?.toDate ? migratedData.updatedAt.toDate().toISOString() : (migratedData.updatedAt ?? "");
         return {
           id: doc.id,
-          code: migratedData.code ?? "",
           title: migratedData.title ?? "",
-          type: migratedData.type,
+          propertyType: migratedData.propertyType,
           status: migratedData.status ?? undefined,
-          bedrooms: migratedData.bedrooms ?? 0,
-          bathrooms: migratedData.bathrooms ?? 0,
-          suites: migratedData.suites ?? 0,
           updatedAt,
         };
       } catch (error) {
@@ -55,13 +24,9 @@ export async function listProperties(): Promise<PropertyListItem[]> {
         // Retornar dados padrão para documentos com erro
         return {
           id: doc.id,
-          code: "",
           title: "",
-          type: "Casa" as const,
+          propertyType: undefined,
           status: undefined,
-          bedrooms: 0,
-          bathrooms: 0,
-          suites: 0,
           updatedAt: "",
         };
       }
@@ -77,26 +42,18 @@ export async function listProperties(): Promise<PropertyListItem[]> {
         try {
           return {
             id: item.id || "",
-            code: item.code || "",
             title: item.title || "",
-            type: ["Casa", "Apartamento", "Terreno", "Comercial"].includes(item.type) ? item.type : "Casa",
-            status: ["Venda", "Aluguel"].includes(item.status) ? item.status : undefined,
-            bedrooms: typeof item.bedrooms === 'number' ? item.bedrooms : 0,
-            bathrooms: typeof item.bathrooms === 'number' ? item.bathrooms : 0,
-            suites: typeof item.suites === 'number' ? item.suites : 0,
+            propertyType: propertyTypes.includes(item.propertyType) ? item.propertyType : undefined,
+            status: statusProperty.includes(item.status) ? item.status : undefined,
             updatedAt: item.updatedAt || "",
           };
         } catch (error) {
           console.error('Erro ao corrigir item:', item, error);
           return {
             id: item.id || "",
-            code: "",
             title: "",
-            type: "Casa" as const,
+            propertyType: undefined,
             status: undefined,
-            bedrooms: 0,
-            bathrooms: 0,
-            suites: 0,
             updatedAt: "",
           };
         }

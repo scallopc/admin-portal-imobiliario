@@ -18,9 +18,9 @@ export default function PropertyTable() {
       cell: (row: PropertyListItem) => row.title || '—'
     },
     {
-      key: "type",
+      key: "propertyType",
       header: "Tipo",
-      cell: (row: PropertyListItem) => row.type
+      cell: (row: PropertyListItem) => row.propertyType
     },
     {
       key: "status",
@@ -37,8 +37,6 @@ export default function PropertyTable() {
   const router = useRouter()
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [selectedProperty, setSelectedProperty] = useState<PropertyListItem | null>(null)
-  const [viewDialogOpen, setViewDialogOpen] = useState(false)
-  const [propertyToView, setPropertyToView] = useState<string | null>(null)
 
   const { data, isLoading } = useProperties()
   const { mutate: deleteProperty, isPending: isDeleting } = useDeleteProperty()
