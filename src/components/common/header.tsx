@@ -41,6 +41,7 @@ export default function Header() {
         { label: "Leads", href: "/leads" },
         { label: "Imóveis", href: "/property" },
         { label: "Lançamentos", href: "/releases" },
+        { label: "Follow-up", href: "/follow-up" },
     ];
 
     const toggleMenu = () => {

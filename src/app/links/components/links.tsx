@@ -10,7 +10,7 @@ import { ExportButton } from "@/components/common/export-button"
 import { useLinks } from "@/hooks/queries/use-links"
 import { useExportLinks } from "@/hooks/queries/use-export-links"
 
-export default function LinksClient() {
+export default function Links() {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const { data: links = [], isLoading } = useLinks()

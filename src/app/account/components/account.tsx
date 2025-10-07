@@ -8,7 +8,7 @@ import { ChangePasswordDialog } from "@/app/account/components/change-password-d
 import { useUser } from "@/hooks/queries/use-user"
 import { Loader2, User } from "lucide-react"
 
-export default function AccountClient() {
+export default function Account() {
     const { data: user, isLoading, error } = useUser()
 
     if (isLoading) {

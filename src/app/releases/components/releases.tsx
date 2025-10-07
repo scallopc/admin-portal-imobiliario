@@ -7,7 +7,7 @@ import Title from '@/components/common/title'
 import { toast } from 'sonner'
 import { ExcelImportForm } from './excel-import-form'
 
-export function ReleasesClient() {
+export function Releases() {
   const excelInputRef = React.useRef<HTMLInputElement | null>(null)
   const [isParsingExcel, setIsParsingExcel] = React.useState(false)
   const [excelData, setExcelData] = React.useState<{ columns: string[]; items: Record<string, any>[]; description?: string } | null>(null)

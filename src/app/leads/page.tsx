@@ -1,4 +1,4 @@
-import LeadsClient from './components/leads-client';
+import Leads from './components/leads';
 import { getSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 
@@ -9,5 +9,5 @@ export default async function LeadsPage() {
     redirect('/authentication');
   }  
   
-  return <LeadsClient />;
+  return <Leads />;
 }

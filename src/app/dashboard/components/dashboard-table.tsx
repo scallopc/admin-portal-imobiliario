@@ -21,11 +21,11 @@ export default function DashboardTable() {
   const columns = [
     { key: "name", header: "Nome", cell: (row: LeadListItem) => row.name || "" },
     { 
-      key: "stage", 
-      header: "Etapa", 
+      key: "status", 
+      header: "Status", 
       cell: (row: LeadListItem) => (
-        <Badge className={stageColors[row.stage as keyof typeof stageColors]}>
-          {row.stage}
+        <Badge className={stageColors[row.status as keyof typeof stageColors]}>
+          {row.status}
         </Badge>
       )
     },
@@ -46,7 +46,7 @@ export default function DashboardTable() {
   const [leadToView, setLeadToView] = useState<LeadListItem | null>(null)
   const filteredRows = useMemo(() => {
     if (!data) return []
-    return data.filter(lead => lead.stage === "Novo")
+    return data.filter(lead => lead.status === "Novo")
   }, [data])
 
   

@@ -105,3 +105,23 @@ export const defaultFeatures = [
     "Área de serviço",
     
   ] as const
+
+  export const statusLead = [
+    "Novo",
+    "Contatado",
+    "Qualificado",
+    "Ganho",
+    "Perdido"
+  ] as const
+
+  export const sourceLead = [
+    "JadeChat",
+    "WhatsApp",
+    "Telegram",
+    "Instagram",
+    "Facebook",
+    "Twitter",
+    "LinkedIn",
+    "Indicação",
+    "Outro"
+  ] as const

@@ -37,7 +37,6 @@ export async function updateProperty(params: { id: string }, input: UpdateProper
 
     // 2. Após o sucesso da atualização, deleta as imagens no Cloudinary
     if (urlsToDelete && urlsToDelete.length > 0) {
-      console.log("EXECUTANDO EXCLUSÃO NO CLOUDINARY PARA:", urlsToDelete);
       await CloudinaryService.deleteFiles(urlsToDelete);
     }
 

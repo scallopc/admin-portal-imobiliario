@@ -20,18 +20,18 @@ function migrateLeadData(data: any) {
   };
 
   const sourceMapping: Record<string, string> = {
-    website: "Site",
-    social: "Redes Sociais",
+    website: "JadeChat",
+    social: "Instagram",
     referral: "Indicação",
     other: "Outro",
-    site: "Site",
-    redes_sociais: "Redes Sociais",
-    "redes sociais": "Redes Sociais",
+    site: "JadeChat",
+    redes_sociais: "Instagram",
+    "redes sociais": "Instagram",
     indicacao: "Indicação",
     indicação: "Indicação",
     outro: "Outro",
     // Adiciona qualquer valor em minúsculas
-    ...Object.fromEntries(["Site", "Redes Sociais", "Indicação", "Outro"].map(v => [v.toLowerCase(), v])),
+    ...Object.fromEntries(["JadeChat", "WhatsApp", "Telegram", "Instagram", "Facebook", "Twitter", "LinkedIn", "Indicação", "Outro"].map(v => [v.toLowerCase(), v])),
   };
 
   // Garante que o stage seja um dos valores válidos
@@ -39,7 +39,7 @@ function migrateLeadData(data: any) {
   const stage = stageMapping[data.stage] || data.stage;
 
   // Garante que o source seja um dos valores válidos
-  const validSources = ["Site", "Redes Sociais", "Indicação", "Outro"];
+  const validSources = ["JadeChat", "WhatsApp", "Telegram", "Instagram", "Facebook", "Twitter", "LinkedIn", "Indicação", "Outro"];
   const source =
     sourceMapping[data.source?.toLowerCase()] || (validSources.includes(data.source) ? data.source : "Outro");
 
@@ -52,7 +52,7 @@ function migrateLeadData(data: any) {
 
 export async function listLeads(): Promise<LeadListItem[]> {
   try {
-    const snapshot = await adminDb.collection("leads").orderBy("createdAt", "desc").get();
+    const snapshot = await adminDb.collection("leads").get();
 
     const leads: LeadListItem[] = [];
 
@@ -68,11 +68,11 @@ export async function listLeads(): Promise<LeadListItem[]> {
           name: migratedData.name || "",
           email: migratedData.email || "",
           phone: migratedData.phone || "",
-          stage: migratedData.stage,
+          status: migratedData.stage,
           source: migratedData.source,
           notes: migratedData.notes || "",
-          createdAt: migratedData.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
-          updatedAt: migratedData.updatedAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+          createdAt: (migratedData.createdAt?.toDate?.() || migratedData.createdAt?.toDate?.() || new Date()).toISOString(),
+          updatedAt: (migratedData.updatedAt?.toDate?.() || migratedData.updatedAt?.toDate?.() || new Date()).toISOString(),
         };
 
         // Validação individual de cada lead
@@ -108,7 +108,7 @@ export async function listLeads(): Promise<LeadListItem[]> {
 
 export async function listRecentLeads(limit: number = 5): Promise<LeadListItem[]> {
   try {
-    const snapshot = await adminDb.collection("leads").orderBy("createdAt", "desc").limit(limit).get();
+    const snapshot = await adminDb.collection("leads").limit(limit).get();
 
     const leads: LeadListItem[] = [];
 
@@ -123,11 +123,11 @@ export async function listRecentLeads(limit: number = 5): Promise<LeadListItem[]
           name: migratedData.name || "",
           email: migratedData.email || "",
           phone: migratedData.phone || "",
-          stage: migratedData.stage,
+          status: migratedData.stage,
           source: migratedData.source,
           notes: migratedData.notes || "",
-          createdAt: migratedData.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
-          updatedAt: migratedData.updatedAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+          createdAt: (migratedData.createdAt?.toDate?.() || migratedData.createdAt?.toDate?.() || new Date()).toISOString(),
+          updatedAt: (migratedData.updatedAt?.toDate?.() || migratedData.updatedAt?.toDate?.() || new Date()).toISOString(),
         };
 
         const parsedLead = leadListItemSchema.safeParse(leadData);

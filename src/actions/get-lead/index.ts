@@ -20,12 +20,12 @@ function migrateLeadData(data: any) {
   }
 
   const sourceMapping: Record<string, string> = {
-    'website': 'Site',
-    'social': 'Redes Sociais',
+    'website': 'JadeChat',
+    'social': 'Instagram',
     'referral': 'Indicação',
     'other': 'Outro',
-    'site': 'Site',
-    'redes_sociais': 'Redes Sociais',
+    'site': 'JadeChat',
+    'redes_sociais': 'Instagram',
     'indicacao': 'Indicação',
     'outro': 'Outro'
   }
@@ -33,7 +33,7 @@ function migrateLeadData(data: any) {
   return {
     ...data,
     stage: stageMapping[data.stage] || data.stage || 'Novo',
-    source: sourceMapping[data.source] || data.source || 'Site'
+    source: sourceMapping[data.source] || data.source || 'JadeChat'
   }
 }
 
@@ -53,7 +53,7 @@ export async function getLead(params: { id: string }): Promise<LeadDTO> {
     name: migratedData.name || "",
     email: migratedData.email || "",
     phone: migratedData.phone || "",
-    stage: migratedData.stage,
+    status: migratedData.stage,
     source: migratedData.source,
     notes: migratedData.notes || "",
     createdAt: migratedData.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),

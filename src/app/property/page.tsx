@@ -1,4 +1,4 @@
-import PropertyClient from './components/property-client';
+import PropertyClient from './components/property';
 import { getSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 

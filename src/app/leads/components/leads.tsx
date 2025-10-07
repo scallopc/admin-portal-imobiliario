@@ -9,7 +9,7 @@ import { ExportButton } from "@/components/common/export-button"
 import { useLeads } from "@/hooks/queries/use-leads"
 import { useExportLeads } from "@/hooks/queries/use-export-leads"
 
-export default function LeadsClient() {
+export default function Leads() {
   const router = useRouter()
 
   const { data: leads = [], isLoading } = useLeads()

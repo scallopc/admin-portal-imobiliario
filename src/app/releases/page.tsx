@@ -1,4 +1,4 @@
-import { ReleasesClient } from './components/releases-client'
+import { Releases } from './components/releases'
 import { getSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 
@@ -11,5 +11,5 @@ export default async function ReleasesPage() {
   }
 
 
-  return <ReleasesClient />
+  return <Releases />
 }

@@ -1,4 +1,4 @@
-import LinksClient from './components/links-client';
+import Links from './components/links';
 import { getSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 
@@ -9,7 +9,7 @@ export default async function LinksPage() {
     redirect('/authentication');
   }
   
-  return <LinksClient />;
+  return <Links />;
 }
 
 

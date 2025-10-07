@@ -76,8 +76,8 @@ export function LeadView({ lead, open, onOpenChange }: LeadViewProps) {
                   <TrendingUp className="h-4 w-4 text-muted-foreground" />
                   <label className="text-sm font-medium text-muted-foreground">Status</label>
                 </div>
-                <Badge className={stageColors[lead.stage as keyof typeof stageColors]}>
-                  {lead.stage}
+                <Badge className={stageColors[lead.status as keyof typeof stageColors]}>
+                  {lead.status}
                 </Badge>
               </div>
 

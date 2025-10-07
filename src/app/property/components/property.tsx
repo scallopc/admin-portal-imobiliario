@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { useRouter } from "next/navigation"
 
-export default function PropertyClient() {
+export default function Property() {
   const router = useRouter()
 
   const handleNavigation = (href: string) => {

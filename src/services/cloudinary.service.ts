@@ -114,7 +114,6 @@ export class CloudinaryService {
     }
 
     const publicIds = urls.map(url => CloudinaryService.extractPublicId(url)).filter((id): id is string => !!id);
-    console.log("Extracted public IDs:", publicIds);
 
     if (publicIds.length === 0) {
       console.warn("No valid public IDs found to delete.");
