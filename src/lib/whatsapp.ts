@@ -54,7 +54,7 @@ class WhatsAppService {
    * Envia uma mensagem de texto simples
    */
   async sendTextMessage(to: string, message: string): Promise<WhatsAppResponse> {
-    const payload = {
+    const payload: WhatsAppMessage = {
       messaging_product: 'whatsapp',
       to,
       type: 'text',
@@ -75,7 +75,7 @@ class WhatsAppService {
     languageCode: string = 'pt_BR',
     parameters: string[] = []
   ): Promise<WhatsAppResponse> {
-    const payload = {
+    const payload: WhatsAppMessage = {
       messaging_product: 'whatsapp',
       to,
       type: 'template',

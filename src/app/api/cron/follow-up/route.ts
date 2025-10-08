@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getLeadsForFollowUp, generateFollowUpMessage, generateFollowUpSummary } from '@/lib/follow-up'
 
 // Configuração do cron job
-export const config = {
-  runtime: 'nodejs',
-}
+export const runtime = 'nodejs'
 
 export async function GET(request: NextRequest) {
   // Verificar se é uma chamada do cron job

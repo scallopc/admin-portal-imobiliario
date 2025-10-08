@@ -5,13 +5,9 @@ import { PropertyListItem } from '@/actions/list-properties/schema';
 export function useExportProperties() {
   const defaultHeaders = {
     id: 'ID',
-    code: 'Código',
     title: 'Título',
-    type: 'Tipo',
+    propertyType: 'Tipo',
     status: 'Status',
-    bedrooms: 'Quartos',
-    bathrooms: 'Banheiros',
-    suites: 'Suítes',
     updatedAt: 'Última Atualização',
   };
 
