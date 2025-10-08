@@ -26,8 +26,20 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         <SummaryCard title="Total de Leads" subtitle={leadsLoading ? "..." : leads.length} />
         <SummaryCard title="Imóveis Cadastrados" subtitle={propertiesLoading ? "..." : properties.length} />
-        <SummaryCard title="Links Gerados" subtitle={linksLoading ? "..." : links.length} />
-        <SummaryCard title="Taxa de Conversão" subtitle="3.2%" />
+        <SummaryCard 
+          title="Oportunidades Ativas" 
+          subtitle={isLoadingMetrics ? "..." : metrics?.opportunities || 0} 
+        />
+        <SummaryCard 
+          title="Taxa de Conversão" 
+          subtitle={
+            isLoadingMetrics 
+              ? "..." 
+              : metrics?.activeLeads && metrics?.opportunities 
+                ? `${((metrics.opportunities / metrics.activeLeads) * 100).toFixed(1)}%`
+                : "0%"
+          } 
+        />
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
@@ -92,7 +104,13 @@ export default function Dashboard() {
                       metrics?.chatInteractions || "0"
                     )}
                   </div>
-                  <p className="text-xs text-green-600 dark:text-green-400">Conversas ativas</p>
+                  <p className="text-xs text-green-600 dark:text-green-400">
+                    {isLoadingMetrics ? "Carregando..." : 
+                     metrics?.chatInteractions ? 
+                       `Média: ${(metrics.chatInteractions / 30).toFixed(1)}/dia` : 
+                       "Conversas ativas"
+                    }
+                  </p>
                 </div>
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-green-500 to-green-600 shadow-lg transition-transform duration-300 group-hover:scale-110">
                   <span className="text-xl text-white">💬</span>

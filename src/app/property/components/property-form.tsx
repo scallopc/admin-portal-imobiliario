@@ -17,8 +17,8 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useRouter } from "next/navigation";
 import { useImproveAll } from "@/hooks/mutations/use-improve-all";
-import { v4 as uuidv4 } from 'uuid';
-import { useState, useEffect } from 'react';
+import { v4 as uuidv4 } from "uuid";
+import { useState, useEffect } from "react";
 
 const propertyFormSchema = propertyBaseSchema.extend({
   address: addressSchema,
@@ -48,7 +48,7 @@ export default function PropertyForm({
 }: PropertyFormProps) {
   const router = useRouter();
   const improveAllMutation = useImproveAll();
-  const [propertyId, setPropertyId] = useState(initialPropertyId || '');
+  const [propertyId, setPropertyId] = useState(initialPropertyId || "");
 
   useEffect(() => {
     if (!isEdit && !initialPropertyId) {
@@ -78,6 +78,7 @@ export default function PropertyForm({
       videoUrl: "",
       virtualTourUrl: "",
       seo: "",
+      highlight: false,
       address: {
         city: defaultValues?.address?.city || "Rio de Janeiro",
         street: "",
@@ -112,7 +113,6 @@ export default function PropertyForm({
 
   const handleSubmit = async (values: PropertyFormValues) => {
     try {
-
       // Verificar se o formulário é válido
       const isValid = await form.trigger();
       if (!isValid) {
@@ -211,19 +211,35 @@ export default function PropertyForm({
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="furnished"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel className="text-base">Mobiliado?</FormLabel>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="furnished"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel className="text-base">Mobiliado?</FormLabel>
 
-                <FormControl>
-                  <Switch checked={field.value} onCheckedChange={field.onChange} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
+                  <FormControl>
+                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="highlight"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel className="text-base">Destacar Imóvel</FormLabel>
+                  <FormControl>
+                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                  </FormControl>
+                  <p className="text-muted-foreground text-xs">Máximo 6 imóveis em destaque</p>
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <FormField
@@ -592,7 +608,12 @@ export default function PropertyForm({
                 Imagens <span className="text-red-500">*</span>
               </FormLabel>
               <FormControl>
-                <ImageUpload value={field.value as any[] || []} onChange={field.onChange} onBlur={field.onBlur} onRemoveUrl={onRemoveUrl} />
+                <ImageUpload
+                  value={(field.value as any[]) || []}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  onRemoveUrl={onRemoveUrl}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -605,7 +626,12 @@ export default function PropertyForm({
             <FormItem>
               <FormLabel>Imagens das Plantas</FormLabel>
               <FormControl>
-                <ImageUpload value={field.value as any[] || []} onChange={field.onChange} onBlur={field.onBlur} onRemoveUrl={onRemoveUrl} />
+                <ImageUpload
+                  value={(field.value as any[]) || []}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  onRemoveUrl={onRemoveUrl}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

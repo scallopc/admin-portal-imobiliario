@@ -28,6 +28,19 @@ export default function PropertyTable() {
       cell: (row: PropertyListItem) => row.status || '—'
     },
     {
+      key: "highlight",
+      header: "Destaque",
+      cell: (row: PropertyListItem) => (
+        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+          row.highlight 
+            ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' 
+            : ''
+        }`}>
+          {row.highlight ? '⭐ Em Destaque' : ''}
+        </span>
+      )
+    },
+    {
       key: "updatedAt",
       header: "Atualizado em",
       cell: (row: PropertyListItem) => row.updatedAt ? new Date(row.updatedAt).toLocaleDateString('pt-BR') : '—'

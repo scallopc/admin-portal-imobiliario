@@ -17,6 +17,7 @@ export async function listProperties(): Promise<PropertyListItem[]> {
           title: migratedData.title ?? "",
           propertyType: migratedData.propertyType,
           status: migratedData.status ?? undefined,
+          highlight: migratedData.highlight ?? false,
           updatedAt,
         };
       } catch (error) {
@@ -40,13 +41,14 @@ export async function listProperties(): Promise<PropertyListItem[]> {
       // Tentar corrigir dados inválidos
       const correctedData = data.map(item => {
         try {
-          return {
-            id: item.id || "",
-            title: item.title || "",
-            propertyType: propertyTypes.includes(item.propertyType) ? item.propertyType : undefined,
-            status: statusProperty.includes(item.status) ? item.status : undefined,
-            updatedAt: item.updatedAt || "",
-          };
+        return {
+          id: item.id || "",
+          title: item.title || "",
+          propertyType: propertyTypes.includes(item.propertyType) ? item.propertyType : undefined,
+          status: statusProperty.includes(item.status) ? item.status : undefined,
+          highlight: item.highlight ?? false,
+          updatedAt: item.updatedAt || "",
+        };
         } catch (error) {
           console.error('Erro ao corrigir item:', item, error);
           return {
@@ -54,6 +56,7 @@ export async function listProperties(): Promise<PropertyListItem[]> {
             title: "",
             propertyType: undefined,
             status: undefined,
+            highlight: false,
             updatedAt: "",
           };
         }

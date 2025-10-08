@@ -6,6 +6,7 @@ export const propertyListItemSchema = z.object({
   title: z.string().default(""),
   propertyType: z.enum(propertyTypes),
   status: z.enum(statusProperty).optional(),
+  highlight: z.boolean().optional().default(false),
   updatedAt: z.string().default(""),
 });
 

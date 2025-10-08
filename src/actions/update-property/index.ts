@@ -24,6 +24,24 @@ export async function updateProperty(params: { id: string }, input: UpdateProper
     const { id } = paramsResult.data;
     const updateData = inputResult.data;
 
+    // Validar máximo 6 imóveis em destaque (apenas se estiver marcando como destaque)
+    if (updateData.highlight) {
+      const highlightCount = await adminDb
+        .collection("properties")
+        .where("highlight", "==", true)
+        .get();
+      
+      // Se já existem 6 imóveis em destaque e este não é um deles, bloquear
+      if (highlightCount.size >= 6) {
+        const currentProperty = await docRef.get();
+        const isCurrentlyHighlighted = currentProperty.data()?.highlight;
+        
+        if (!isCurrentlyHighlighted) {
+          throw new Error("Máximo de 6 imóveis em destaque permitido");
+        }
+      }
+    }
+
     const docRef = adminDb.collection("properties").doc(id);
 
     // Extrai as URLs para deletar e o resto dos dados
