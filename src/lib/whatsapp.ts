@@ -162,10 +162,6 @@ class WhatsAppService {
     // URL correta: https://graph.facebook.com/v18.0/{phone-number-id}/messages
     const url = `${this.baseUrl}/${this.phoneNumberId}/messages`
     
-    console.log(`📱 Enviando para URL: ${url}`)
-    console.log(`📱 Access Token: ${this.accessToken.substring(0, 10)}...`)
-    console.log(`📱 Phone Number ID: ${this.phoneNumberId}`)
-    console.log(`📱 Payload:`, JSON.stringify(payload, null, 2))
     
     try {
       const response = await fetch(url, {
@@ -178,8 +174,6 @@ class WhatsAppService {
       })
 
       const responseText = await response.text()
-      console.log(`📱 Response Status: ${response.status}`)
-      console.log(`📱 Response Body:`, responseText)
 
       if (!response.ok) {
         let errorData

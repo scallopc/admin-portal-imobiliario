@@ -32,7 +32,7 @@ export const propertyBaseSchema = z.object({
   virtualTourUrl: z.string().url().optional().or(z.literal("")),
   seo: z.string().optional(),
   furnished: z.boolean().optional(),
-  highlight: z.boolean().optional().default(false),
+  highlight: z.boolean().default(false),
   address: addressSchema,
 });
 
@@ -58,7 +58,7 @@ export const propertySchema = z.object({
   virtualTourUrl: z.string().url().optional().or(z.literal("")),
   seo: z.string().optional(),
   furnished: z.boolean().optional(),
-  highlight: z.boolean().optional().default(false),
+  highlight: z.boolean().default(false),
   address: addressSchema,
 });
 

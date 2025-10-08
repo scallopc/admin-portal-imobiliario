@@ -21,6 +21,7 @@ type ImportPayload = {
     features?: string[];
     videoUrl?: string;
     virtualTourUrl?: string;
+    delivery: string;
   };
   units: Record<string, any>[];
 };
@@ -28,8 +29,14 @@ type ImportPayload = {
 export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as ImportPayload;
+
+    
     if (!body || !Array.isArray(body.units) || body.units.length === 0) {
       return NextResponse.json({ error: "Payload inválido. Envie units como um array não vazio." }, { status: 400 });
+    }
+
+    if (!body.release?.delivery || body.release.delivery.trim() === "") {
+      return NextResponse.json({ error: "Data de entrega é obrigatória." }, { status: 400 });
     }
 
     const prices = (body.units || [])
@@ -64,6 +71,7 @@ export async function POST(req: NextRequest) {
       features: Array.isArray(body.release?.features) ? body.release!.features : [],
       videoUrl: body.release?.videoUrl,
       virtualTourUrl: body.release?.virtualTourUrl,
+      delivery: body.release?.delivery,
       unitsCount: body.units.length,
       minUnitPrice,
       units: body.units.map((unit, index) => ({
@@ -77,6 +85,10 @@ export async function POST(req: NextRequest) {
     };
 
     const releaseRef = await adminDb.collection("releases").add(releaseData);
+        
+    // Verificar se foi salvo corretamente
+    const savedDoc = await releaseRef.get()
+
 
     return NextResponse.json({ success: true, releaseId: releaseRef.id });
   } catch (error: any) {

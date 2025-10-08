@@ -35,6 +35,7 @@ export type Release = {
   virtualTourUrl: string;
   propertyType: string;
   features: string[];
+  delivery?: string;
 
   [key: string]: any;
 };

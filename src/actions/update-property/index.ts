@@ -23,6 +23,7 @@ export async function updateProperty(params: { id: string }, input: UpdateProper
 
     const { id } = paramsResult.data;
     const updateData = inputResult.data;
+    const docRef = adminDb.collection("properties").doc(id);
 
     // Validar máximo 6 imóveis em destaque (apenas se estiver marcando como destaque)
     if (updateData.highlight) {
@@ -41,8 +42,6 @@ export async function updateProperty(params: { id: string }, input: UpdateProper
         }
       }
     }
-
-    const docRef = adminDb.collection("properties").doc(id);
 
     // Extrai as URLs para deletar e o resto dos dados
     const { urlsToDelete, ...propertyData } = updateData;

@@ -3,8 +3,6 @@ import { adminDb } from '@/lib/firebase-admin'
 
 export async function GET() {
   try {
-    console.log('🔧 Iniciando correção de leads...')
-    
     // Buscar todos os leads
     const leadsSnapshot = await adminDb.collection('leads').get()
     
@@ -50,7 +48,6 @@ export async function GET() {
         created_at: createdDate.toISOString()
       })
       
-      console.log(`✅ ${data.name}: Adicionado next_contact = ${next_contact.toISOString()}`)
     }
     
     return NextResponse.json({

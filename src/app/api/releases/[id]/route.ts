@@ -19,6 +19,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const body = await request.json();
+  
     if (!body || typeof body !== "object") {
       return NextResponse.json({ error: "Payload inválido" }, { status: 400 });
     }
@@ -36,6 +37,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     if (Array.isArray(body.features)) payload.features = body.features;
     if (typeof body.videoUrl === "string") payload.videoUrl = body.videoUrl;
     if (typeof body.virtualTourUrl === "string") payload.virtualTourUrl = body.virtualTourUrl;
+    if (typeof body.delivery === "string" && body.delivery.trim() !== "") payload.delivery = body.delivery;
     if (typeof body.status === "string") payload.status = body.status;
 
     if (Object.keys(payload).length === 0) {
@@ -43,6 +45,10 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     }
 
     await adminDb.collection("releases").doc(params.id).set(payload, { merge: true });
+    
+    // Verificar se foi salvo corretamente
+    const savedDoc = await adminDb.collection("releases").doc(params.id).get()
+    
     return NextResponse.json({ success: true });
   } catch (error: any) {
     return NextResponse.json({ error: error?.message || "Erro ao atualizar lançamento" }, { status: 500 });

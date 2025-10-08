@@ -228,6 +228,7 @@ export default function ReleaseDetailsClient({ id }: Props) {
                   features: Array.isArray(data?.features) ? data.features : [],
                   videoUrl: data?.videoUrl || "",
                   virtualTourUrl: data?.virtualTourUrl || "",
+                  delivery: data?.delivery || "",
                 }}
                 onSubmit={handleReleaseSubmit}
                 isLoading={updateRelease.isPending}

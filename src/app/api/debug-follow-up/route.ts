@@ -2,15 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { adminDb } from '@/lib/firebase-admin'
 
 export async function GET() {
-  try {
-    console.log('🔍 Debug: Analisando leads para follow-up...')
-    
+  try {    
     const today = new Date()
-    console.log('📅 Data atual:', today.toISOString())
     
     // Buscar TODOS os leads primeiro
     const allLeadsSnapshot = await adminDb.collection('leads').get()
-    console.log(`📋 Total de leads: ${allLeadsSnapshot.size}`)
     
     const allLeads: any[] = []
     allLeadsSnapshot.forEach((doc) => {
@@ -31,9 +27,7 @@ export async function GET() {
       .collection('leads')
       .where('status', 'in', ['Novo', 'Contatado', 'Qualificado'])
       .get()
-    
-    console.log(`📋 Leads com status "Novo", "Contatado" ou "Qualificado": ${statusLeadsSnapshot.size}`)
-    
+        
     const statusLeads: any[] = []
     statusLeadsSnapshot.forEach((doc) => {
       const data = doc.data()

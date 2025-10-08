@@ -14,6 +14,7 @@ export type UpdateReleaseInput = {
   features?: string[]
   videoUrl?: string
   virtualTourUrl?: string
+  delivery: string
   address?: {
     city?: string
     state?: string

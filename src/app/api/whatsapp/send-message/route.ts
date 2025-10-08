@@ -15,17 +15,14 @@ export async function POST(request: NextRequest) {
 
     // Validar e formatar número de telefone
     const formattedPhone = WhatsAppService.validatePhoneNumber(phone)
-    console.log(`📱 Enviando mensagem para: ${formattedPhone}`)
 
     let response
 
     if (message) {
       // Enviar mensagem personalizada
-      console.log(`📝 Mensagem personalizada: ${message}`)
       response = await whatsappService.sendTextMessage(formattedPhone, message)
     } else if (leadId && leadName && leadStatus && leadSource) {
       // Enviar mensagem de follow-up automática
-      console.log(`🤖 Follow-up automático para: ${leadName}`)
       response = await whatsappService.sendFollowUpMessage({
         name: leadName,
         phone: formattedPhone,
@@ -38,8 +35,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
-
-    console.log(`✅ Mensagem enviada com sucesso:`, response)
 
     return NextResponse.json({
       success: true,

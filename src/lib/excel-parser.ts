@@ -60,7 +60,10 @@ export function parseCSV(csvContent: string): any[] {
         'caracteristicas': 'features',
         'imagens': 'images',
         'videos': 'videos',
-        'palavras-chave': 'keywords'
+        'palavras-chave': 'keywords',
+        'entrega': 'delivery',
+        'data_entrega': 'delivery',
+        'entrega_data': 'delivery'
       }
       
       const fieldName = fieldMap[header] || header

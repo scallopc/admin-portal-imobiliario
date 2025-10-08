@@ -14,14 +14,15 @@ export async function createRelease(input: CreateReleaseInput) {
 
     const validatedInput = createReleaseSchema.parse(input)
     
+    
     const releaseData = {
       ...validatedInput,
       createdBy: user.id,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     }
-
     const docRef = await adminDb.collection('releases').add(releaseData)
+    const savedDoc = await docRef.get()
     
     return {
       success: true,

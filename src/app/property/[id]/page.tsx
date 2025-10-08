@@ -106,6 +106,7 @@ export default function EditPropertyPage() {
     suiteDetails: safeString(data.suiteDetails),
     parkingSpaces: safeNumber(data.parkingSpaces),
     furnished: safeBoolean(data.furnished),
+    highlight: safeBoolean(data.highlight),
     address: {
       street: safeString(data.address?.street),
       number: safeString(data.address?.number),

@@ -10,8 +10,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { ImageUpload } from "@/components/common/image-upload";
-import { defaultNeighborhoods, propertyTypes, releaseStatuses, cities, defaultValues, defaultFeatures } from "@/lib/constants";
+import {
+  defaultNeighborhoods,
+  propertyTypes,
+  releaseStatuses,
+  cities,
+  defaultValues,
+  defaultFeatures,
+} from "@/lib/constants";
 import { ChipAutocomplete } from "@/components/ui/chip-autocomplete";
+import { MonthYearPicker } from "@/components/ui/month-year-picker";
 import { useImproveAll } from "@/hooks/mutations/use-improve-all";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -35,6 +43,7 @@ const baseReleaseFormSchema = z.object({
   features: z.array(z.string()).min(1, "Características são obrigatórias"),
   videoUrl: z.string().url().optional().or(z.literal("")),
   virtualTourUrl: z.string().url().optional().or(z.literal("")),
+  delivery: z.string().min(1, "Data de entrega é obrigatória"),
 });
 
 const mappingSchema = z.object({
@@ -60,6 +69,7 @@ type ReleaseFormValues = z.infer<typeof baseReleaseFormSchema> & {
   parkingSpaces?: string;
   privateArea?: string;
   price?: string;
+  delivery?: string;
 };
 
 type ReleaseFormProps = {
@@ -114,6 +124,7 @@ export function ReleaseForm({
       features: [],
       videoUrl: "",
       virtualTourUrl: "",
+      delivery: new Date().toISOString(),
       // Campos de mapeamento (apenas para importação)
       ...(isImport && {
         unit: "",
@@ -195,21 +206,39 @@ export function ReleaseForm({
             </FormItem>
           )}
         />
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <FormField
+            control={form.control}
+            name="developer"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Construtora</FormLabel>
+                <FormControl>
+                  <Input placeholder="Nome da construtora" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="developer"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Construtora</FormLabel>
-              <FormControl>
-                <Input placeholder="Nome da construtora" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
+          <FormField
+            control={form.control}
+            name="delivery"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Data de Entrega <span className="text-red-500">*</span></FormLabel>
+                <FormControl>
+                  <MonthYearPicker
+                    value={field.value ? new Date(field.value) : undefined}
+                    onChange={date => field.onChange(date?.toISOString())}
+                    placeholder="Selecione mês e ano de entrega"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <FormField
             control={form.control}
@@ -436,7 +465,7 @@ export function ReleaseForm({
                 Imagens do Empreendimento <span className="text-red-500">*</span>
               </FormLabel>
               <FormControl>
-                <ImageUpload value={field.value as any[] || []} onChange={field.onChange} onBlur={field.onBlur} />
+                <ImageUpload value={(field.value as any[]) || []} onChange={field.onChange} onBlur={field.onBlur} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -450,7 +479,7 @@ export function ReleaseForm({
             <FormItem>
               <FormLabel>Imagens das Plantas</FormLabel>
               <FormControl>
-                <ImageUpload value={field.value as any[] || []} onChange={field.onChange} onBlur={field.onBlur} />
+                <ImageUpload value={(field.value as any[]) || []} onChange={field.onChange} onBlur={field.onBlur} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -460,7 +489,7 @@ export function ReleaseForm({
         {isImport && (
           <div className="md:col-span-2">
             <div className="border-t pt-6">
-              <h3 className="text-lg font-semibold mb-4">Mapear colunas do Excel</h3>
+              <h3 className="mb-4 text-lg font-semibold">Mapear colunas do Excel</h3>
               <div className="grid grid-cols-12 gap-4">
                 <FormField
                   control={form.control}
@@ -471,10 +500,13 @@ export function ReleaseForm({
                         Unidade <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
-                        <Select value={field.value || ""} onValueChange={(value) => {
-                          field.onChange(value);
-                          onMappingChange?.("unit", value);
-                        }}>
+                        <Select
+                          value={field.value || ""}
+                          onValueChange={value => {
+                            field.onChange(value);
+                            onMappingChange?.("unit", value);
+                          }}
+                        >
                           <SelectTrigger className="w-full">
                             <SelectValue placeholder="Selecione a coluna" />
                           </SelectTrigger>
@@ -499,10 +531,13 @@ export function ReleaseForm({
                     <FormItem className="col-span-12 md:col-span-4">
                       <FormLabel>Status</FormLabel>
                       <FormControl>
-                        <Select value={field.value || ""} onValueChange={(value) => {
-                          field.onChange(value);
-                          onMappingChange?.("status", value);
-                        }}>
+                        <Select
+                          value={field.value || ""}
+                          onValueChange={value => {
+                            field.onChange(value);
+                            onMappingChange?.("status", value);
+                          }}
+                        >
                           <SelectTrigger className="w-full">
                             <SelectValue placeholder="Selecione a coluna" />
                           </SelectTrigger>
@@ -529,10 +564,13 @@ export function ReleaseForm({
                         Dormitórios <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
-                        <Select value={field.value || ""} onValueChange={(value) => {
-                          field.onChange(value);
-                          onMappingChange?.("bedrooms", value);
-                        }}>
+                        <Select
+                          value={field.value || ""}
+                          onValueChange={value => {
+                            field.onChange(value);
+                            onMappingChange?.("bedrooms", value);
+                          }}
+                        >
                           <SelectTrigger className="w-full">
                             <SelectValue placeholder="Selecione a coluna" />
                           </SelectTrigger>
@@ -557,10 +595,13 @@ export function ReleaseForm({
                     <FormItem className="col-span-12 md:col-span-4">
                       <FormLabel>Vagas</FormLabel>
                       <FormControl>
-                        <Select value={field.value || ""} onValueChange={(value) => {
-                          field.onChange(value);
-                          onMappingChange?.("parkingSpaces", value);
-                        }}>
+                        <Select
+                          value={field.value || ""}
+                          onValueChange={value => {
+                            field.onChange(value);
+                            onMappingChange?.("parkingSpaces", value);
+                          }}
+                        >
                           <SelectTrigger className="w-full">
                             <SelectValue placeholder="Selecione a coluna" />
                           </SelectTrigger>
@@ -587,10 +628,13 @@ export function ReleaseForm({
                         Metragem (m²) <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
-                        <Select value={field.value || ""} onValueChange={(value) => {
-                          field.onChange(value);
-                          onMappingChange?.("privateArea", value);
-                        }}>
+                        <Select
+                          value={field.value || ""}
+                          onValueChange={value => {
+                            field.onChange(value);
+                            onMappingChange?.("privateArea", value);
+                          }}
+                        >
                           <SelectTrigger className="w-full">
                             <SelectValue placeholder="Selecione a coluna" />
                           </SelectTrigger>
@@ -617,10 +661,13 @@ export function ReleaseForm({
                         Preço <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
-                        <Select value={field.value || ""} onValueChange={(value) => {
-                          field.onChange(value);
-                          onMappingChange?.("price", value);
-                        }}>
+                        <Select
+                          value={field.value || ""}
+                          onValueChange={value => {
+                            field.onChange(value);
+                            onMappingChange?.("price", value);
+                          }}
+                        >
                           <SelectTrigger className="w-full">
                             <SelectValue placeholder="Selecione a coluna" />
                           </SelectTrigger>
@@ -662,7 +709,7 @@ export function ReleaseForm({
           <Button
             type="submit"
             disabled={isLoading}
-            className="bg-gradient-to-r from-accent to-accent/90 hover:from-accent/90 hover:to-accent text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            className="from-accent to-accent/90 hover:from-accent/90 hover:to-accent transform rounded-lg bg-gradient-to-r px-6 py-2 text-white shadow-md transition-all duration-200 hover:scale-105 hover:shadow-lg disabled:transform-none disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isLoading ? (
               <>

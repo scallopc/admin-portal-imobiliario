@@ -78,6 +78,7 @@ export const createReleaseSchema = z.object({
   constructionProgress: z.number().min(0).max(100).optional(),
   launchDate: z.string().optional(),
   deliveryDate: z.string().optional(),
+  delivery: z.string().min(1, "Data de entrega é obrigatória"),
   totalUnits: z.number().int().positive().optional(),
   availableUnits: z.number().int().nonnegative().optional(),
   minPrice: z.number().nonnegative().optional(),

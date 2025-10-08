@@ -18,6 +18,7 @@ export type ImportReleaseInput = {
     features?: string[]
     videoUrl?: string
     virtualTourUrl?: string
+    delivery: string
   }
   units: Record<string, any>[]
 }

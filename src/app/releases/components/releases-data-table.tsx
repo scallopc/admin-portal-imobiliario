@@ -32,7 +32,6 @@ export function ReleasesDataTable() {
   const router = useRouter()
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [selectedRelease, setSelectedRelease] = useState<Release | null>(null)
-  const [viewDialogOpen, setViewDialogOpen] = useState(false)
 
   const { data: releases = [], isLoading } = useReleases()
 
@@ -125,6 +124,35 @@ export function ReleasesDataTable() {
         }
         return <div className="text-sm text-muted-foreground">—</div>
       },
+    },
+    {
+      key: 'delivery',
+      header: 'Entrega',
+      cell: (row: Release) => {
+        const delivery = (row as any)?.delivery
+        if (!delivery) {
+          return <div className="text-sm text-muted-foreground">—</div>
+        }
+        
+        try {
+          const date = new Date(delivery)
+          const monthNames = [
+            'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
+            'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
+          ]
+          
+          return (
+            <div className="text-sm">
+              <div className="font-medium">
+                {monthNames[date.getMonth()]}/{date.getFullYear()}
+              </div>
+            </div>
+          )
+        } catch {
+          return <div className="text-sm text-muted-foreground">—</div>
+        }
+      },
+      sortable: true,
     },
     {
       key: 'createdAt',

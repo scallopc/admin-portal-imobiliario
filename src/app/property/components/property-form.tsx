@@ -20,11 +20,11 @@ import { useImproveAll } from "@/hooks/mutations/use-improve-all";
 import { v4 as uuidv4 } from "uuid";
 import { useState, useEffect } from "react";
 
-const propertyFormSchema = propertyBaseSchema.extend({
-  address: addressSchema,
-});
+const propertyFormSchema = propertyBaseSchema;
 
-export type PropertyFormValues = z.infer<typeof propertyFormSchema>;
+export type PropertyFormValues = z.infer<typeof propertyFormSchema> & {
+  highlight: boolean;
+};
 
 type PropertyFormProps = {
   defaultValues?: Partial<PropertyFormValues>;
