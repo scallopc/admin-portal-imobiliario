@@ -1,14 +1,12 @@
 "use client";
 import { ImageUpload } from "@/components/common/image-upload";
 import { ChipAutocomplete } from "@/components/ui/chip-autocomplete";
-import { propertyBaseSchema, addressSchema } from "@/schemas/property";
-import { defaultNeighborhoods, propertyTypes, defaultValues, defaultFeatures, statusProperty } from "@/lib/constants";
-import { useGenerateSEO } from "@/hooks/mutations/use-generate-seo";
+import { propertyBaseSchema } from "@/schemas/property";
+import { defaultNeighborhoods, propertyTypes, defaultFeatures, statusProperty } from "@/lib/constants";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -22,8 +20,38 @@ import { useState, useEffect } from "react";
 
 const propertyFormSchema = propertyBaseSchema;
 
-export type PropertyFormValues = z.infer<typeof propertyFormSchema> & {
+export type PropertyFormValues = {
+  title: string;
+  slug: string;
+  description: string;
+  propertyType: string;
+  status: string;
+  price: string;
+  totalArea?: number;
+  privateArea: number;
+  usefulArea: number;
+  bedrooms: number;
+  bathrooms: number;
+  suites: number;
+  suiteDetails?: string;
+  parkingSpaces?: number;
+  features: string[];
+  images: (string | File)[];
+  floorPlans?: (string | File)[];
+  videoUrl?: string;
+  virtualTourUrl?: string;
+  seo?: string;
+  furnished?: boolean;
   highlight: boolean;
+  address: {
+    street: string;
+    number: string;
+    neighborhood: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+  };
 };
 
 type PropertyFormProps = {
@@ -56,7 +84,7 @@ export default function PropertyForm({
     }
   }, [isEdit, initialPropertyId]);
   const form = useForm<PropertyFormValues>({
-    resolver: zodResolver(propertyFormSchema),
+    resolver: zodResolver(propertyFormSchema) as any,
     defaultValues: {
       title: "",
       slug: "",

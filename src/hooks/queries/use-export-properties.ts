@@ -8,6 +8,7 @@ export function useExportProperties() {
     title: 'Título',
     propertyType: 'Tipo',
     status: 'Status',
+    highlight: 'Destaque',
     updatedAt: 'Última Atualização',
   };
 

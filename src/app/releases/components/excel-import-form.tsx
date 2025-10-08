@@ -130,6 +130,7 @@ export function ExcelImportForm({ columns, items, onCancel, description }: Excel
           id: releaseId,
           images: newImageUrls,
           floorPlans: newFloorPlanUrls,
+          delivery: new Date().toISOString(),
         });
       }
 
