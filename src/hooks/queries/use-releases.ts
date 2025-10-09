@@ -9,11 +9,21 @@ export function useReleases() {
     queryOptions({
       queryKey: releasesQueryKey(),
       queryFn: async () => {
-        const res = await fetch('/api/releases', { cache: 'no-store' })
+        const res = await fetch('/api/releases', { 
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          }
+        })
         if (!res.ok) throw new Error('Falha ao carregar lançamentos')
         return (await res.json()) as Release[]
       },
-      staleTime: 30_000,
+      staleTime: 0, // Dados sempre considerados stale
+      gcTime: 5 * 60 * 1000, // 5 minutos no cache
+      refetchOnWindowFocus: true,
+      refetchOnMount: true,
     })
   );
 }

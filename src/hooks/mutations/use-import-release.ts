@@ -44,7 +44,9 @@ export function useImportRelease() {
       return await res.json()
     },
     onSuccess: () => {
+      // Invalidar e refetch para garantir dados atualizados
       queryClient.invalidateQueries({ queryKey: releasesQueryKey() })
+      queryClient.refetchQueries({ queryKey: releasesQueryKey() })
     }
   })
 }

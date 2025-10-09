@@ -134,7 +134,10 @@ export function ExcelImportForm({ columns, items, onCancel, description }: Excel
         });
       }
 
+      // Invalidar e refetch para garantir dados atualizados
       await queryClient.invalidateQueries({ queryKey: releasesQueryKey() });
+      await queryClient.refetchQueries({ queryKey: releasesQueryKey() });
+      
       toast.success("Importação concluída com sucesso!", { id: toastId });
       onCancel(); // Fecha o formulário de importação
 
