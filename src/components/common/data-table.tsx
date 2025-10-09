@@ -264,7 +264,7 @@ export function DataTable<T extends Record<string, unknown>>({
     return (
         <div className="overflow-hidden rounded-lg border">
             <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-                <table className={"min-w-full" + (tableClassName ?? "")}>
+                <table className={"w-full table-auto" + (tableClassName ?? "")}>
                     <thead className={"bg-[#7B756D]/75 text-left text-xs uppercase " + (headClassName ?? "")}>
                         <tr>
                             {columns.map((col, idx) => {
@@ -273,7 +273,7 @@ export function DataTable<T extends Record<string, unknown>>({
                                     <th
                                         key={String(col.key)}
                                         className={
-                                            "px-2 py-3 font-medium whitespace-nowrap sm:px-4 " +
+                                            "px-2 py-3 font-medium sm:px-4 " +
                                             (idx === 0 ? " rounded-tl-lg" : "") +
                                             (idx === columns.length - 1 ? " rounded-tr-lg" : "") +
                                             (col.className ? " " + col.className : "") +
@@ -322,7 +322,7 @@ export function DataTable<T extends Record<string, unknown>>({
                                 <tr key={idx} className={`hover:bg-muted/50 ${rowClassName ?? ""}`}>
                                     {columns.map(col => (
                                         <td key={String(col.key)} className={"px-2 py-3 text-xs sm:px-4 sm:text-sm " + (col.className ?? "")}>
-                                            <div className="max-w-[150px] sm:max-w-none truncate">
+                                            <div className="break-words">
                                                 {col.cell ? col.cell(row) : String(row[col.key as keyof T] ?? "")}
                                             </div>
                                         </td>
