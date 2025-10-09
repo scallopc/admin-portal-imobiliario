@@ -22,7 +22,7 @@ declare module 'cloudinary' {
     height: number
     format: string
     resource_type: string
-    created_at: string
+    createdAt: string
     tags: string[]
     bytes: number
     type: string

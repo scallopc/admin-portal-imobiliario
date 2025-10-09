@@ -4,24 +4,27 @@ import { useState, useCallback, useRef, useEffect, useMemo } from "react"
 import { useDropzone, type DropzoneOptions, type FileRejection } from "react-dropzone"
 import { Button } from "@/components/ui/button"
 import { X, Upload, Loader2, Maximize2, CheckCircle2, AlertCircle } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { useImageUpload } from "@/hooks/use-image-upload"
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { useImageUpload } from "@/hooks/queries/use-image-upload";
 import { Progress } from "@/components/ui/progress"
 
-type ImageUploadProps = {
-  value: string[]
-  onChange: (value: string[]) => void
-  maxFiles?: number
-  className?: string
-}
+type ImageValue = string | File;
 
-export function ImageUpload({ value = [], onChange, maxFiles = 20, className }: ImageUploadProps) {
+type ImageUploadProps = {
+  value: ImageValue[];
+  onChange: (value: ImageValue[]) => void;
+  onBlur?: () => void;
+  onRemoveUrl?: (url: string) => void; // Nova prop
+  className?: string;
+};
+export function ImageUpload({ value = [], onChange, onBlur, onRemoveUrl, className }: ImageUploadProps) {
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null)
   const [isAnimating, setIsAnimating] = useState<number | null>(null)
-  const prevValueRef = useRef<string[]>(value)
+  const prevValueRef = useRef<ImageValue[]>(value);
   const timeoutRef = useRef<NodeJS.Timeout>()
-  const [handleUpload, uploadState, handleDeleteImages, resetUploadState] = useImageUpload()
-  
+  const [handleUpload, uploadState, , resetUploadState] = useImageUpload();
+
   // Reseta o estado de upload quando o componente é desmontado
   useEffect(() => {
     return () => {
@@ -45,7 +48,7 @@ export function ImageUpload({ value = [], onChange, maxFiles = 20, className }: 
     }
     prevValueRef.current = value
   }, [value.length])
-  
+
   // Mensagem de status baseada no estado do upload
   const statusMessage = useMemo(() => {
     if (uploadState.error) {
@@ -56,7 +59,7 @@ export function ImageUpload({ value = [], onChange, maxFiles = 20, className }: 
         </div>
       )
     }
-    
+
     if (uploadState.isUploading) {
       return (
         <div className="w-full space-y-2">
@@ -72,7 +75,7 @@ export function ImageUpload({ value = [], onChange, maxFiles = 20, className }: 
         </div>
       )
     }
-    
+
     if (uploadState.uploadedFiles > 0 && !uploadState.isUploading) {
       return (
         <div className="flex items-center gap-2 text-green-600 dark:text-green-400 text-sm">
@@ -81,29 +84,34 @@ export function ImageUpload({ value = [], onChange, maxFiles = 20, className }: 
         </div>
       )
     }
-    
+
     return null
   }, [uploadState])
 
   const onDrop = useCallback(
-    async (acceptedFiles: File[]) => {
-      if (value.length + acceptedFiles.length > maxFiles) {
-        alert(`Você só pode enviar no máximo ${maxFiles} imagens.`)
-        return
-      }
-
-      try {
-        const uploadedUrls = await handleUpload(acceptedFiles)
-        if (uploadedUrls.length > 0) {
-          onChange([...value, ...uploadedUrls])
-        }
-      } catch (error) {
-        // O erro já é tratado no hook useImageUpload
-        console.error('Erro ao fazer upload das imagens:', error)
-      }
+    (acceptedFiles: File[]) => {
+      onChange([...value, ...acceptedFiles]);
+      onBlur?.();
     },
-    [value, maxFiles, onChange, handleUpload]
-  )
+    [value, onChange, onBlur]
+  );
+
+  const removeImage = (index: number) => {
+    if (uploadState.isUploading) {
+      return;
+    }
+
+    const itemToRemove = value[index];
+
+    // Se for uma string (URL salva), notifica a remoção
+    if (typeof itemToRemove === 'string' && onRemoveUrl) {
+      onRemoveUrl(itemToRemove);
+    }
+
+    // Atualiza o estado visual removendo o item
+    onChange(value.filter((_, i) => i !== index));
+    onBlur?.();
+  };
 
   const { getRootProps, getInputProps, isDragActive, fileRejections } = useDropzone({
     onDrop,
@@ -112,32 +120,9 @@ export function ImageUpload({ value = [], onChange, maxFiles = 20, className }: 
       'image/png': ['.png'],
       'image/webp': ['.webp']
     },
-    maxFiles: maxFiles - value.length,
     maxSize: 10 * 1024 * 1024, // 10MB
-    disabled: uploadState.isUploading || value.length >= maxFiles,
-  })
-
-  const removeImage = async (index: number) => {
-    if (uploadState.isUploading) {
-      console.warn('Aguarde o término do upload atual')
-      return
-    }
-    
-    const imageToRemove = value[index]
-    const newImages = [...value]
-    newImages.splice(index, 1)
-    onChange(newImages)
-    
-    // Remove a imagem do Cloudinary em segundo plano
-    try {
-      await handleDeleteImages([imageToRemove])
-    } catch (error) {
-      console.error('Erro ao remover imagem do Cloudinary:', error)
-      // Não revertemos a remoção da UI mesmo se falhar no Cloudinary
-      // para evitar que a interface fique inconsistente
-    }
-  }
-
+    disabled: uploadState.isUploading,
+  });
   return (
     <div className={cn("space-y-4", className)}>
       <div
@@ -145,37 +130,33 @@ export function ImageUpload({ value = [], onChange, maxFiles = 20, className }: 
         className={cn(
           "border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors",
           isDragActive ? "border-primary bg-primary/10" : "border-muted-foreground/25 hover:border-muted-foreground/50",
-          (uploadState.isUploading || value.length >= maxFiles) && "opacity-50 cursor-not-allowed"
+          uploadState.isUploading && "opacity-50 cursor-not-allowed"
         )}
-        aria-disabled={uploadState.isUploading || value.length >= maxFiles}
+        aria-disabled={uploadState.isUploading}
       >
-        <input {...getInputProps()} disabled={uploadState.isUploading || value.length >= maxFiles} />
+        <input {...getInputProps()} disabled={uploadState.isUploading} />
         <div className="flex flex-col items-center justify-center space-y-4">
           {uploadState.isUploading ? (
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           ) : (
             <Upload className="h-8 w-8 text-muted-foreground" />
           )}
-          
+
           <div className="w-full space-y-2">
             <p className="text-sm font-medium">
-              {uploadState.isUploading 
+              {uploadState.isUploading
                 ? 'Enviando imagens...'
-                : isDragActive 
+                : isDragActive
                   ? "Solte as imagens aqui"
                   : "Arraste e solte imagens aqui, ou clique para selecionar"}
             </p>
-            
+
             {!uploadState.isUploading && (
               <p className="text-xs text-muted-foreground">
                 Formatos suportados: JPG, PNG, WEBP (máx. 10MB)
               </p>
             )}
-            
-            <p className="text-xs text-muted-foreground">
-              {value.length}/{maxFiles} imagens
-            </p>
-            
+
             {statusMessage && (
               <div className="mt-2">
                 {statusMessage}
@@ -197,49 +178,55 @@ export function ImageUpload({ value = [], onChange, maxFiles = 20, className }: 
         </div>
       )}
 
-      {value.length > 0 && (
+      {value && value.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {value.map((image, index) => (
-            <div
-              key={index}
-              className={cn(
-                "relative group rounded-md overflow-hidden border border-border aspect-square",
-                isAnimating === index && "animate-fade-in",
-                isAnimating === -1 && "animate-fade-out"
-              )}
-            >
-              <img
-                src={image}
-                alt={`Imagem ${index + 1}`}
-                className="w-full h-full object-cover"
-                onClick={() => setFullscreenImage(image)}
-                loading="lazy"
-              />
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  removeImage(index)
-                }}
-                className="cursor-pointer absolute top-2 right-2 p-1 rounded-full bg-destructive/80 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                aria-label="Remover imagem"
-                disabled={uploadState.isUploading}
+          {value.map((item, index) => {
+            const previewUrl = typeof item === 'string' ? item : URL.createObjectURL(item);
+            const key = typeof item === 'string' ? item : `${item.name}-${item.lastModified}`;
+
+            if (!previewUrl) return null;
+
+            return (
+              <div
+                key={key}
+                className={cn(
+                  "relative group rounded-md overflow-hidden border border-border aspect-square",
+                  isAnimating === index && "animate-fade-in",
+                  isAnimating === -1 && "animate-fade-out"
+                )}
               >
-                <X className="h-4 w-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setFullscreenImage(image)}
-                className="cursor-pointer absolute top-2 left-2 p-1 rounded-full bg-background/80 text-foreground opacity-0 group-hover:opacity-100 transition-opacity"
-                aria-label="Ampliar imagem"
-              >
-                <Maximize2 className="h-4 w-4" />
-              </button>
-            </div>
-          ))}
+                <img
+                  src={previewUrl}
+                  alt={`Imagem ${index + 1}`}
+                  className="w-full h-full object-cover"
+                  onClick={() => setFullscreenImage(previewUrl)}
+                  loading="lazy"
+                />
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeImage(index);
+                  }}
+                  className="cursor-pointer absolute top-2 right-2 p-1 rounded-full bg-destructive/80 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                  aria-label="Remover imagem"
+                  disabled={uploadState.isUploading}
+                >
+                  <X className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFullscreenImage(previewUrl)}
+                  className="cursor-pointer absolute top-2 left-2 p-1 rounded-full bg-background/80 text-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+                  aria-label="Ampliar imagem"
+                >
+                  <Maximize2 className="h-4 w-4" />
+                </button>
+              </div>
+            );
+          })}
         </div>
       )}
-
       {fullscreenImage && (
         <div
           className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"

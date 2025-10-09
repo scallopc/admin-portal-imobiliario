@@ -50,6 +50,11 @@ export function DataTable<T extends Record<string, unknown>>({
     const [sortColumn, setSortColumn] = useState<keyof T | string | null>(null)
     const [sortDirection, setSortDirection] = useState<SortDirection>(null)
 
+    // Reset page when data changes
+    React.useEffect(() => {
+        setCurrentPage(1)
+    }, [data.length])
+
     const sortedData = useMemo(() => {
         if (!enableSorting || !sortColumn || !sortDirection) return data
 
@@ -102,17 +107,17 @@ export function DataTable<T extends Record<string, unknown>>({
         return Math.min(currentPage * pageSize, sortedData.length)
     }, [sortedData.length, currentPage, pageSize, showPagination])
 
-    const handlePageChange = (page: number) => {
+    const handlePageChange = React.useCallback((page: number) => {
         setCurrentPage(Math.max(1, Math.min(page, totalPages)))
-    }
+    }, [totalPages])
 
-    const handlePageSizeChange = (newPageSize: string) => {
+    const handlePageSizeChange = React.useCallback((newPageSize: string) => {
         const size = parseInt(newPageSize)
         setPageSize(size)
         setCurrentPage(1) // Reset to first page when changing page size
-    }
+    }, [])
 
-    const handleSort = (columnKey: keyof T | string) => {
+    const handleSort = React.useCallback((columnKey: keyof T | string) => {
         if (!enableSorting) return
 
         const column = columns.find(col => col.key === columnKey)
@@ -134,9 +139,9 @@ export function DataTable<T extends Record<string, unknown>>({
         
         // Reset to first page when sorting
         setCurrentPage(1)
-    }
+    }, [enableSorting, columns, sortColumn, sortDirection])
 
-    const getSortIcon = (columnKey: keyof T | string) => {
+    const getSortIcon = React.useCallback((columnKey: keyof T | string) => {
         if (!enableSorting) return null
         
         const column = columns.find(col => col.key === columnKey)
@@ -151,7 +156,7 @@ export function DataTable<T extends Record<string, unknown>>({
         }
         
         return <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
-    }
+    }, [enableSorting, columns, sortColumn, sortDirection])
 
     const renderPagination = () => {
         if (!showPagination || sortedData.length === 0) return null

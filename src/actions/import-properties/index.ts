@@ -29,7 +29,7 @@ export async function importProperties(data: ImportPropertiesInput) {
           features: property.features || [],
           images: property.images || [],
           videos: property.videos || [],
-          keywords: property.keywords || [],
+          seo: property.seo || undefined,
           // Garantir que campos opcionais tenham valores padrão
           furnished: property.furnished || false,
           currency: property.currency || 'BRL',

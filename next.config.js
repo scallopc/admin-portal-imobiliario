@@ -1,18 +1,23 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    serverActions: {
+      allowedOrigins: ["localhost:3000"],
+    },
+  },
   webpack: (config, { isServer }) => {
     if (!isServer) {
-      config.resolve = config.resolve || {}
+      config.resolve = config.resolve || {};
       config.resolve.fallback = {
         ...(config.resolve.fallback || {}),
         undici: false,
-      }
+      };
       config.resolve.alias = {
         ...(config.resolve.alias || {}),
         undici: false,
-      }
+      };
     }
-    return config
+    return config;
   },
   images: {
     remotePatterns: [
@@ -27,26 +32,6 @@ const nextConfig = {
         pathname: "/**",
       },
     ],
-  },
-  async rewrites() {
-    return [
-      {
-        source: "/lancamentos",
-        destination: "/releases",
-      },
-      {
-        source: "/imoveis",
-        destination: "/property",
-      },
-      {
-        source: "/locacao",
-        destination: "/rental",
-      },
-      {
-        source: "/quem-somos",
-        destination: "/about",
-      },
-    ];
   },
 };
 

@@ -2,14 +2,13 @@
 
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/common/data-table"
-import { PenSquare, Trash, Eye } from "lucide-react"
+import { PenSquare, Trash } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useProperties } from "@/hooks/queries/use-properties"
 import { useDeleteProperty } from "@/hooks/mutations/use-delete-property"
 import { DeleteDialog } from "@/components/common/delete-dialog"
 import { PropertyListItem } from "@/actions/list-properties/schema"
-import { PropertyView } from "./property-view"
 
 export default function PropertyTable() {
   const columns = [
@@ -19,14 +18,27 @@ export default function PropertyTable() {
       cell: (row: PropertyListItem) => row.title || '—'
     },
     {
-      key: "type",
+      key: "propertyType",
       header: "Tipo",
-      cell: (row: PropertyListItem) => row.type
+      cell: (row: PropertyListItem) => row.propertyType
     },
     {
       key: "status",
       header: "Status",
       cell: (row: PropertyListItem) => row.status || '—'
+    },
+    {
+      key: "highlight",
+      header: "Destaque",
+      cell: (row: PropertyListItem) => (
+        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+          row.highlight 
+            ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' 
+            : ''
+        }`}>
+          {row.highlight ? '⭐ Em Destaque' : ''}
+        </span>
+      )
     },
     {
       key: "updatedAt",
@@ -38,19 +50,12 @@ export default function PropertyTable() {
   const router = useRouter()
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [selectedProperty, setSelectedProperty] = useState<PropertyListItem | null>(null)
-  const [viewDialogOpen, setViewDialogOpen] = useState(false)
-  const [propertyToView, setPropertyToView] = useState<string | null>(null)
 
   const { data, isLoading } = useProperties()
   const { mutate: deleteProperty, isPending: isDeleting } = useDeleteProperty()
 
   const handleEdit = (property: PropertyListItem) => {
     router.push(`/property/${property.id}`)
-  }
-
-  const handleView = (property: PropertyListItem) => {
-    setPropertyToView(property.id)
-    setViewDialogOpen(true)
   }
 
   const handleDeleteClick = (property: PropertyListItem) => {
@@ -60,8 +65,11 @@ export default function PropertyTable() {
 
   const handleConfirmDelete = () => {
     if (selectedProperty?.id) {
-      deleteProperty(selectedProperty.id)
-      setDeleteDialogOpen(false)
+      deleteProperty(selectedProperty.id, {
+        onSuccess: () => {
+          setDeleteDialogOpen(false)
+        },
+      })
     }
   }
 
@@ -78,14 +86,6 @@ export default function PropertyTable() {
             sortable: false,
             cell: (row: PropertyListItem) => (
               <div className="flex gap-2">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleView(row)}
-                >
-                  <Eye className="h-5 w-5 text-blue-400" />
-                </Button>
                 <Button
                   type="button"
                   variant="ghost"
@@ -117,12 +117,6 @@ export default function PropertyTable() {
         isLoading={isDeleting}
         title="Excluir imóvel"
         description="Tem certeza que deseja excluir este imóvel? Esta ação não pode ser desfeita."
-      />
-
-      <PropertyView
-        propertyId={propertyToView}
-        open={viewDialogOpen}
-        onOpenChange={setViewDialogOpen}
       />
     </>
   )

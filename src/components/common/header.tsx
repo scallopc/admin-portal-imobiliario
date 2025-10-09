@@ -1,8 +1,8 @@
 'use client'
 
-import { Home, Menu, X } from "lucide-react";
+import { Home, Menu, X, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -16,24 +16,55 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useUser } from "@/hooks/queries/use-user";
 import { userQueryKey } from "@/hooks/queries/use-user";
+import { Loading } from "../ui/loading";
 
 export default function Header() {
     const { data: user, isLoading, error } = useUser()
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isNavigating, setIsNavigating] = useState(false);
     const pathname = usePathname();
     const router = useRouter();
     const queryClient = useQueryClient();
+
+    // Memoize the initials calculation
+    const userInitials = React.useMemo(() => {
+        if (!user?.name) return 'U'
+        return user.name
+            .split(' ')
+            .map(word => word.charAt(0))
+            .join('')
+            .toUpperCase()
+            .slice(0, 2)
+    }, [user?.name])
     const navItems = [
         { label: "Dashboard", href: "/" },
         { label: "Leads", href: "/leads" },
         { label: "Imóveis", href: "/property" },
+        { label: "Lançamentos", href: "/releases" },
+        { label: "Follow-up", href: "/follow-up" },
     ];
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
     };
 
+    const handleNavigation = (href: string) => {
+        if (isNavigating) return;
+        
+        setIsNavigating(true);
+        setIsMenuOpen(false);
+        router.push(href);
+    };
+
+    // Reset loading when route changes
+    useEffect(() => {
+        if (isNavigating) {
+            setIsNavigating(false);
+        }
+    }, [pathname]);
+
     const onLogout = async () => {
+        setIsNavigating(true);
         try {
             await fetch("/api/auth/sign-out", { method: "POST" });
         } finally {
@@ -44,18 +75,14 @@ export default function Header() {
         }
     };
 
-    const getInitials = (name: string) => {
-        return name
-            .split(' ')
-            .map(word => word.charAt(0))
-            .join('')
-            .toUpperCase()
-            .slice(0, 2)
-    }
 
     return (
-        <header className="relative top-0 left-0 right-0 z-50">
-            <div className="w-full px-6  lg:px-8">
+        <>
+            {/* Global Loading Overlay */}
+            {isNavigating && <Loading />}
+            
+            <header className="relative top-0 left-0 right-0 z-50">
+                <div className="w-full px-6  lg:px-8">
                 <div className="flex justify-between items-center py-4 sm:py-6">
                     <Link href="/" className="flex items-center group">
                         <img src="/logogold.svg" alt="Portal Imobiliário" className="h-12 w-auto" />
@@ -67,7 +94,13 @@ export default function Header() {
                             const active = href === "/" ? pathname === "/" : pathname?.startsWith(href);
                             return (
                                 <div key={href} className="inline-flex flex-col items-center">
-                                    <Link href={href} className="text-primary-clean hover:bg-gradient-to-r hover:from-[#e1e2e3] hover:to-[#F2C791] hover:bg-clip-text hover:text-transparent bg-darkBrown/30 hover:bg-gold/20 transition-all duration-300 hover:scale-110 px-3 py-2 rounded-xl">{label}</Link>
+                                    <Button
+                                        onClick={() => handleNavigation(href)}
+                                        variant="ghost"
+                                        className="text-primary-clean hover:text-gold bg-darkBrown/30 hover:bg-gold/20 transition-all duration-300 hover:scale-110 px-3 py-2 rounded-xl"
+                                    >
+                                        {label}
+                                    </Button>
                                     {active && (
                                         <div className="mt-1 h-1 w-full bg-gradient-to-r from-[#F2C791] to-[#A67C58] rounded-full"></div>
                                     )}
@@ -82,7 +115,7 @@ export default function Header() {
                                 <button aria-label="Abrir menu do usuário" className="inline-flex items-center focus:outline-none cursor-pointer">
                                     <Avatar className="h-9 w-9 ring-1 ring-gold/40 bg-[#F2C791] text-[#1a1510] ">
                                         <AvatarImage src="" alt={user?.name} />
-                                        <AvatarFallback className="text-sm font-semibold">{user?.name ? getInitials(user.name) : 'U'}</AvatarFallback>
+                                        <AvatarFallback className="text-sm font-semibold">{userInitials}</AvatarFallback>
                                     </Avatar>
                                 </button>
                             </DropdownMenuTrigger>
@@ -116,18 +149,20 @@ export default function Header() {
                         <div className="mt-2 rounded-2xl border border-gold/30 bg-[#1a1510]/75 backdrop-blur-sm shadow-2xl">
                             <nav className="flex flex-col py-4">
                                 {navItems.map(({ label, href }) => (
-                                    <Link
+                                    <button
                                         key={href}
-                                        href={href}
+                                        onClick={() => handleNavigation(href)}
                                         className="px-5 py-3 text-primary-clean font-semibold hover:text-gold transition-colors"
-                                        onClick={() => setIsMenuOpen(false)}
                                     >
                                         {label}
-                                    </Link>
+                                    </button>
                                 ))}
-                                <Link href="/account" className="px-5 py-3 text-primary-clean font-semibold hover:text-gold transition-colors" onClick={() => setIsMenuOpen(false)}>
+                                <button
+                                    onClick={() => handleNavigation("/account")}
+                                    className="px-5 py-3 text-primary-clean font-semibold hover:text-gold transition-colors"
+                                >
                                     Minha conta
-                                </Link>
+                                </button>
                                 <div className="px-4 pt-2">
                                     <Button className="w-full" variant="outline" onClick={onLogout}>Sair</Button>
                                 </div>
@@ -137,5 +172,6 @@ export default function Header() {
                 )}
             </div>
         </header>
+        </>
     );
 }

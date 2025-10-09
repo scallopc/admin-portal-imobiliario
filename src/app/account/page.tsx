@@ -1,4 +1,4 @@
-import AccountClient from './components/account-client';
+import Account from './components/account';
 import { getSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 
@@ -9,5 +9,5 @@ export default async function AccountPage() {
     redirect('/authentication');
   }
   
-  return <AccountClient />;
+  return <Account />;
 }

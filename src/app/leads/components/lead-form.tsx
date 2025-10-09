@@ -11,6 +11,7 @@ import { PatternFormat } from "react-number-format"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { zodPtBrErrorMap } from "@/lib/zod-ptbr-error-map"
 import { createLeadSchema, type CreateLeadInput } from "@/actions/create-lead/schema"
+import { sourceLead, statusLead } from "@/lib/constants"
 import { useRouter } from "next/navigation"
 
 z.setErrorMap(zodPtBrErrorMap)
@@ -32,8 +33,8 @@ export default function LeadForm({ defaultValues, onSubmit, isSubmitting, resetO
       name: "",
       email: "",
       phone: "",
-      stage: "Novo" as const,
-      source: "Site" as const,
+      status: "Novo" as const,
+      source: "JadeChat" as const,
       notes: "",
       ...defaultValues,
     },
@@ -43,6 +44,7 @@ export default function LeadForm({ defaultValues, onSubmit, isSubmitting, resetO
   const onValid: SubmitHandler<CreateLeadInput> = async (data) => {
     await onSubmit(data)
     if (resetOnSuccess) form.reset()
+      router.push("/leads")
   }
 
   return (
@@ -81,18 +83,18 @@ export default function LeadForm({ defaultValues, onSubmit, isSubmitting, resetO
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <FormField name="stage" control={form.control} render={({ field }) => (
+          <FormField name="status" control={form.control} render={({ field }) => (
             <FormItem>
-              <FormLabel className="mb-2">Estágio</FormLabel>
+              <FormLabel className="mb-2">Status</FormLabel>
               <FormControl>
                 <Select value={field.value} onValueChange={field.onChange}>
                   <SelectTrigger className="w-full"><SelectValue placeholder="Selecione" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Novo">Novo</SelectItem>
-                    <SelectItem value="Contactado">Contactado</SelectItem>
-                    <SelectItem value="Qualificado">Qualificado</SelectItem>
-                    <SelectItem value="Ganho">Ganho</SelectItem>
-                    <SelectItem value="Perdido">Perdido</SelectItem>
+                    {statusLead.map((stage) => (
+                      <SelectItem key={stage} value={stage}>
+                        {stage}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </FormControl>
@@ -107,10 +109,11 @@ export default function LeadForm({ defaultValues, onSubmit, isSubmitting, resetO
                 <Select value={field.value} onValueChange={field.onChange}>
                   <SelectTrigger className="w-full"><SelectValue placeholder="Selecione" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Site">Site</SelectItem>
-                    <SelectItem value="Redes Sociais">Redes sociais</SelectItem>
-                    <SelectItem value="Indicação">Indicação</SelectItem>
-                    <SelectItem value="Outro">Outro</SelectItem>
+                    {sourceLead.map((source) => (
+                      <SelectItem key={source} value={source}>
+                        {source}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </FormControl>
