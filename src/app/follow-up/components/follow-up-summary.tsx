@@ -140,37 +140,36 @@ export default function FollowUpSummary() {
   return (
     <div className="space-y-4">
       {/* Header com estatísticas */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <MessageSquare className="h-5 w-5 text-blue-600" />
-            <h3 className="text-lg font-semibold">Follow-up</h3>
-            <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-              {stats?.total || 0}
-            </Badge>
-          </div>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-2">
+          <MessageSquare className="h-5 w-5 text-blue-600" />
+          <h3 className="text-lg font-semibold">Follow-up</h3>
+          <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+            {stats?.total || 0}
+          </Badge>
         </div>
         <Button 
           variant="outline" 
           size="sm" 
           onClick={() => router.push('/follow-up')}
+          className="w-fit self-start sm:self-auto"
         >
           Ver todos
         </Button>
       </div>
 
       {/* Cards de resumo */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Total de follow-ups */}
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <MessageSquare className="h-5 w-5 text-blue-600" />
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Total</p>
-                <p className="text-2xl font-bold">{stats?.total || 0}</p>
+              <div className="text-center sm:text-left">
+                <p className="text-xs sm:text-sm text-muted-foreground">Total</p>
+                <p className="text-lg sm:text-2xl font-bold">{stats?.total || 0}</p>
               </div>
             </div>
           </CardContent>
@@ -178,14 +177,14 @@ export default function FollowUpSummary() {
 
         {/* Atrasados */}
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                <AlertTriangle className="h-5 w-5 text-red-600" />
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Atrasados</p>
-                <p className="text-2xl font-bold text-red-600">{stats?.overdue || 0}</p>
+              <div className="text-center sm:text-left">
+                <p className="text-xs sm:text-sm text-muted-foreground">Atrasados</p>
+                <p className="text-lg sm:text-2xl font-bold text-red-600">{stats?.overdue || 0}</p>
               </div>
             </div>
           </CardContent>
@@ -193,14 +192,14 @@ export default function FollowUpSummary() {
 
         {/* Hoje */}
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                <Clock className="h-5 w-5 text-orange-600" />
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600" />
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Hoje</p>
-                <p className="text-2xl font-bold text-orange-600">{stats?.today || 0}</p>
+              <div className="text-center sm:text-left">
+                <p className="text-xs sm:text-sm text-muted-foreground">Hoje</p>
+                <p className="text-lg sm:text-2xl font-bold text-orange-600">{stats?.today || 0}</p>
               </div>
             </div>
           </CardContent>
@@ -208,14 +207,14 @@ export default function FollowUpSummary() {
 
         {/* Em andamento */}
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <Users className="h-5 w-5 text-green-600" />
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                <Users className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Em Andamento</p>
-                <p className="text-2xl font-bold text-green-600">{stats?.inProgress || 0}</p>
+              <div className="text-center sm:text-left">
+                <p className="text-xs sm:text-sm text-muted-foreground">Em Andamento</p>
+                <p className="text-lg sm:text-2xl font-bold text-green-600">{stats?.inProgress || 0}</p>
               </div>
             </div>
           </CardContent>
@@ -231,23 +230,25 @@ export default function FollowUpSummary() {
           <CardContent>
             <div className="space-y-3">
               {recentLeads.map((lead) => (
-                <div key={lead.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors">
+                <div key={lead.id} className="flex flex-col gap-3 p-3 border rounded-lg hover:bg-muted/50 transition-colors sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
                       <span className="text-sm font-medium text-blue-600">
                         {lead.name.charAt(0).toUpperCase()}
                       </span>
                     </div>
-                    <div>
-                      <p className="font-medium">{lead.name}</p>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <span>{lead.source}</span>
-                        <span>•</span>
-                        <span className={getPriorityColor(lead)}>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium truncate">{lead.name}</p>
+                      <div className="flex flex-col gap-1 text-sm text-muted-foreground sm:flex-row sm:items-center sm:gap-2">
+                        <span className="truncate">{lead.source}</span>
+                        <span className="hidden sm:inline">•</span>
+                        <span className={`${getPriorityColor(lead)} font-medium`}>
                           {getPriorityText(lead)}
                         </span>
-                        <span>•</span>
-                        <span>{format(new Date(lead.nextContact), 'dd/MM/yyyy', { locale: ptBR })}</span>
+                        <span className="hidden sm:inline">•</span>
+                        <span className="text-xs sm:text-sm">
+                          {format(new Date(lead.nextContact), 'dd/MM/yyyy', { locale: ptBR })}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -255,6 +256,7 @@ export default function FollowUpSummary() {
                     variant="ghost"
                     size="sm"
                     onClick={() => router.push('/follow-up')}
+                    className="w-fit self-end sm:self-auto"
                   >
                     <TrendingUp className="h-4 w-4" />
                   </Button>
