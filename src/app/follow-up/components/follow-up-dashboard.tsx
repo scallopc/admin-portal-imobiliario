@@ -95,30 +95,28 @@ export function FollowUpDashboard() {
         return;
       }
 
-      // Enviar mensagem via WhatsApp
-      const response = await fetch("/api/whatsapp/send-message", {
+      // Enviar mensagem via SMS
+      const response = await fetch("/api/sms/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          phone: lead.phone,
+          to: lead.phone,
+          message: `Olá ${lead.name}! Estamos entrando em contato sobre seu interesse em nossos imóveis. Nossa equipe está à disposição para esclarecer dúvidas e agendar uma visita. Entre em contato conosco!`,
           leadId: lead.id,
-          leadName: lead.name,
-          leadStatus: lead.status,
-          leadSource: lead.source,
         }),
       });
 
       const result = await response.json();
 
       if (result.success) {
-        toast.success(`✅ Mensagem WhatsApp enviada para ${lead.name}!`);
+        toast.success(`✅ SMS enviado para ${lead.name}!`);
         // Atualizar dados após envio bem-sucedido
         fetchFollowUpData();
       } else {
-        toast.error(result.error || "Erro ao enviar mensagem WhatsApp");
+        toast.error(result.error || "Erro ao enviar SMS");
       }
     } catch (err) {
-      toast.error("Erro de conexão com WhatsApp");
+      toast.error("Erro de conexão com SMS");
     } finally {
       // Remover lead do loading
       setSendingMessages(prev => {
@@ -135,29 +133,35 @@ export function FollowUpDashboard() {
       return;
     }
 
-    const confirmed = confirm(`Enviar mensagem WhatsApp para todos os ${data.leads.length} leads?`);
+    const confirmed = confirm(`Enviar SMS para todos os ${data.leads.length} leads?`);
     if (!confirmed) return;
 
     try {
       setLoading(true);
       toast.loading("Enviando mensagens...", { id: "send-all" });
 
-      const response = await fetch("/api/whatsapp/send-follow-up", {
+      const response = await fetch("/api/sms/send-bulk", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sendToAll: true }),
+        body: JSON.stringify({ 
+          leads: data.leads.map(lead => ({
+            to: lead.phone,
+            message: `Olá ${lead.name}! Estamos entrando em contato sobre seu interesse em nossos imóveis. Nossa equipe está à disposição para esclarecer dúvidas e agendar uma visita. Entre em contato conosco!`,
+            leadId: lead.id
+          }))
+        }),
       });
 
       const result = await response.json();
 
       if (result.success) {
-        toast.success(`✅ ${result.data.sentMessages} mensagens enviadas com sucesso!`, { id: "send-all" });
+        toast.success(`✅ ${result.data.sentMessages || result.data.sent || data.leads.length} SMS enviados com sucesso!`, { id: "send-all" });
         fetchFollowUpData();
       } else {
-        toast.error(result.error || "Erro ao enviar mensagens em lote", { id: "send-all" });
+        toast.error(result.error || "Erro ao enviar SMS em lote", { id: "send-all" });
       }
     } catch (err) {
-      toast.error("Erro de conexão com WhatsApp", { id: "send-all" });
+      toast.error("Erro de conexão com SMS", { id: "send-all" });
     } finally {
       setLoading(false);
     }
@@ -278,10 +282,10 @@ export function FollowUpDashboard() {
                             <Send className="mr-1 h-4 w-4" />
                           )}
                           <span className="hidden sm:inline">
-                            {sendingMessages.has(lead.id) ? "Enviando..." : "Enviar Mensagem"}
+                            {sendingMessages.has(lead.id) ? "Enviando..." : "Enviar SMS"}
                           </span>
                           <span className="sm:hidden">
-                            {sendingMessages.has(lead.id) ? "Enviando..." : "Enviar"}
+                            {sendingMessages.has(lead.id) ? "Enviando..." : "SMS"}
                           </span>
                         </Button>
 
