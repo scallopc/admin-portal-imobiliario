@@ -95,30 +95,28 @@ export function FollowUpDashboard() {
         return;
       }
 
-      // Enviar mensagem via WhatsApp
-      const response = await fetch("/api/whatsapp/send-message", {
+      // Enviar mensagem via SMS
+      const response = await fetch("/api/sms/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          phone: lead.phone,
+          to: lead.phone,
+          message: `Olá ${lead.name}! Estamos entrando em contato sobre seu interesse em nossos imóveis. Nossa equipe está à disposição para esclarecer dúvidas e agendar uma visita. Entre em contato conosco! zonasullancamentos.com.br`,
           leadId: lead.id,
-          leadName: lead.name,
-          leadStatus: lead.status,
-          leadSource: lead.source,
         }),
       });
 
       const result = await response.json();
 
       if (result.success) {
-        toast.success(`✅ Mensagem WhatsApp enviada para ${lead.name}!`);
+        toast.success(`✅ SMS enviado para ${lead.name}!`);
         // Atualizar dados após envio bem-sucedido
         fetchFollowUpData();
       } else {
-        toast.error(result.error || "Erro ao enviar mensagem WhatsApp");
+        toast.error(result.error || "Erro ao enviar SMS");
       }
     } catch (err) {
-      toast.error("Erro de conexão com WhatsApp");
+      toast.error("Erro de conexão com SMS");
     } finally {
       // Remover lead do loading
       setSendingMessages(prev => {
@@ -135,29 +133,35 @@ export function FollowUpDashboard() {
       return;
     }
 
-    const confirmed = confirm(`Enviar mensagem WhatsApp para todos os ${data.leads.length} leads?`);
+    const confirmed = confirm(`Enviar SMS para todos os ${data.leads.length} leads?`);
     if (!confirmed) return;
 
     try {
       setLoading(true);
       toast.loading("Enviando mensagens...", { id: "send-all" });
 
-      const response = await fetch("/api/whatsapp/send-follow-up", {
+      const response = await fetch("/api/sms/send-bulk", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sendToAll: true }),
+        body: JSON.stringify({
+          leads: data.leads.map(lead => ({
+            to: lead.phone,
+            message: `Olá ${lead.name}! Estamos entrando em contato sobre seu interesse em nossos imóveis. Nossa equipe está à disposição para esclarecer dúvidas e agendar uma visita. Entre em contato conosco!`,
+            leadId: lead.id
+          }))
+        }),
       });
 
       const result = await response.json();
 
       if (result.success) {
-        toast.success(`✅ ${result.data.sentMessages} mensagens enviadas com sucesso!`, { id: "send-all" });
+        toast.success(`✅ ${result.data.sentMessages || result.data.sent || data.leads.length} SMS enviados com sucesso!`, { id: "send-all" });
         fetchFollowUpData();
       } else {
-        toast.error(result.error || "Erro ao enviar mensagens em lote", { id: "send-all" });
+        toast.error(result.error || "Erro ao enviar SMS em lote", { id: "send-all" });
       }
     } catch (err) {
-      toast.error("Erro de conexão com WhatsApp", { id: "send-all" });
+      toast.error("Erro de conexão com SMS", { id: "send-all" });
     } finally {
       setLoading(false);
     }
@@ -204,7 +208,7 @@ export function FollowUpDashboard() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <CardTitle className="flex items-center">
                 <MessageSquare className="mr-2 h-5 w-5" />
@@ -212,16 +216,18 @@ export function FollowUpDashboard() {
               </CardTitle>
               <CardDescription>{data.total} leads precisam de follow-up</CardDescription>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-col gap-2 sm:flex-row">
               <Button variant="outline" size="sm" onClick={fetchFollowUpData} disabled={loading}>
                 <RefreshCw className={`mr-1 h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-                Atualizar
+                <span className="hidden sm:inline">Atualizar</span>
+                <span className="sm:hidden">Atualizar</span>
               </Button>
 
               {data && data.leads.length > 0 && (
                 <Button variant="default" size="sm" onClick={handleSendAllMessages} disabled={loading}>
                   <Send className="mr-1 h-4 w-4" />
-                  Enviar para Todos
+                  <span className="hidden sm:inline">Enviar para Todos</span>
+                  <span className="sm:hidden">Enviar Todos</span>
                 </Button>
               )}
             </div>
@@ -232,70 +238,83 @@ export function FollowUpDashboard() {
             {data.leads.map(lead => (
               <Card key={lead.id} className="border-l-primary border-l-4">
                 <CardContent className="p-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="mb-2 flex items-center gap-2">
-                        <User className="text-muted-foreground h-4 w-4" />
-                        <span className="font-semibold">{lead.name}</span>
-                        <Badge variant={getPriorityColor(lead.nextContact)}>{getPriorityText(lead.nextContact)}</Badge>
-                      </div>
-
-                      <div className="text-muted-foreground grid grid-cols-2 gap-4 text-sm">
-                        <div className="flex items-center gap-2">
-                          <Phone className="h-4 w-4" />
-                          <span>{lead.phone}</span>
+                  <div className="space-y-4">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="flex-1 space-y-3">
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2">
+                          <div className="flex items-center gap-2">
+                            <User className="text-muted-foreground h-4 w-4" />
+                            <span className="font-semibold">{lead.name}</span>
+                          </div>
+                          <Badge variant={getPriorityColor(lead.nextContact)} className="w-fit">
+                            {getPriorityText(lead.nextContact)}
+                          </Badge>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4" />
-                          <span>{format(new Date(lead.nextContact), "dd/MM/yyyy", { locale: ptBR })}</span>
+
+                        <div className="text-muted-foreground grid grid-cols-1 gap-2 text-sm sm:grid-cols-2 sm:gap-4">
+                          <div className="flex items-center gap-2">
+                            <Phone className="h-4 w-4 flex-shrink-0" />
+                            <span className="truncate">{lead.phone}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4 flex-shrink-0" />
+                            <span>{format(new Date(lead.nextContact), "dd/MM/yyyy", { locale: ptBR })}</span>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-2 text-sm">
+                          <Badge variant="outline">{lead.status}</Badge>
+                          <Badge variant="outline">{lead.source}</Badge>
                         </div>
                       </div>
 
-                      <div className="mt-2 flex items-center gap-4 text-sm">
-                        <Badge variant="outline">{lead.status}</Badge>
-                        <Badge variant="outline">{lead.source}</Badge>
+                      <div className="flex flex-col gap-2 sm:ml-4 sm:flex-row">
+                        <Button
+                          size="sm"
+                          variant="default"
+                          onClick={() => handleSendMessage(lead.id)}
+                          disabled={sendingMessages.has(lead.id)}
+                          className="w-full sm:w-auto"
+                        >
+                          {sendingMessages.has(lead.id) ? (
+                            <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                          ) : (
+                            <Send className="mr-1 h-4 w-4" />
+                          )}
+                          <span className="hidden sm:inline">
+                            {sendingMessages.has(lead.id) ? "Enviando..." : "Enviar SMS"}
+                          </span>
+                          <span className="sm:hidden">
+                            {sendingMessages.has(lead.id) ? "Enviando..." : "SMS"}
+                          </span>
+                        </Button>
+
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button size="sm" variant="outline" className="w-full sm:w-auto">
+                              <MoreHorizontal className="h-4 w-4" />
+                              <span className="ml-1 sm:hidden">Ações</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleAction(lead.id, "contacted")}>
+                              <MessageSquare className="mr-2 h-4 w-4" />
+                              Marcar como Contatado
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleAction(lead.id, "qualified")}>
+                              <User className="mr-2 h-4 w-4" />
+                              Marcar como Qualificado
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onClick={() => handleAction(lead.id, "lost")}
+                              className="text-destructive focus:text-destructive"
+                            >
+                              Marcar como Perdido
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
-                    </div>
-
-                    <div className="ml-4 flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="default"
-                        onClick={() => handleSendMessage(lead.id)}
-                        disabled={sendingMessages.has(lead.id)}
-                      >
-                        {sendingMessages.has(lead.id) ? (
-                          <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-                        ) : (
-                          <Send className="mr-1 h-4 w-4" />
-                        )}
-                        {sendingMessages.has(lead.id) ? "Enviando..." : "Enviar Mensagem"}
-                      </Button>
-
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button size="sm" variant="outline">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleAction(lead.id, "contacted")}>
-                            <MessageSquare className="mr-2 h-4 w-4" />
-                            Marcar como Contatado
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleAction(lead.id, "qualified")}>
-                            <User className="mr-2 h-4 w-4" />
-                            Marcar como Qualificado
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem 
-                            onClick={() => handleAction(lead.id, "lost")}
-                            className="text-destructive focus:text-destructive"
-                          >
-                            Marcar como Perdido
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
                     </div>
                   </div>
                 </CardContent>

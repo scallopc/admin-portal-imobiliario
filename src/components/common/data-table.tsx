@@ -91,7 +91,7 @@ export function DataTable<T extends Record<string, unknown>>({
 
     const paginatedData = useMemo(() => {
         if (!showPagination) return sortedData
-        
+
         const startIndex = (currentPage - 1) * pageSize
         const endIndex = startIndex + pageSize
         return sortedData.slice(startIndex, endIndex)
@@ -136,14 +136,14 @@ export function DataTable<T extends Record<string, unknown>>({
             setSortColumn(columnKey)
             setSortDirection("asc")
         }
-        
+
         // Reset to first page when sorting
         setCurrentPage(1)
     }, [enableSorting, columns, sortColumn, sortDirection])
 
     const getSortIcon = React.useCallback((columnKey: keyof T | string) => {
         if (!enableSorting) return null
-        
+
         const column = columns.find(col => col.key === columnKey)
         if (!column || column.sortable === false) return null
 
@@ -154,7 +154,7 @@ export function DataTable<T extends Record<string, unknown>>({
                 <ArrowDown className="h-4 w-4" />
             )
         }
-        
+
         return <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
     }, [enableSorting, columns, sortColumn, sortDirection])
 
@@ -165,18 +165,18 @@ export function DataTable<T extends Record<string, unknown>>({
         const canGoNext = currentPage < totalPages
 
         return (
-            <div className="flex items-center justify-between px-4 py-3 border-t bg-[#7B756D]/75">
-                <div className="flex items-center gap-2 text-sm">
+            <div className="flex flex-col gap-3 px-4 py-3 border-t bg-[#7B756D]/75 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-2 text-xs sm:text-sm">
                     <span>
                         Mostrando {endItem} de {sortedData.length} registros
                     </span>
                 </div>
 
-                <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-2 text-sm">
-                        <span>Itens por página:</span>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-2">
+                    <div className="flex items-center gap-2 text-xs sm:text-sm">
+                        <span className="whitespace-nowrap">Itens por página:</span>
                         <Select value={pageSize.toString()} onValueChange={handlePageSizeChange}>
-                            <SelectTrigger className="w-20 h-8">
+                            <SelectTrigger className="w-18ad h-8 sm:w-20">
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -189,13 +189,13 @@ export function DataTable<T extends Record<string, unknown>>({
                         </Select>
                     </div>
 
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center justify-center gap-1 sm:gap-1">
                         <Button
                             variant="outline"
                             size="sm"
                             onClick={() => handlePageChange(1)}
                             disabled={!canGoPrevious}
-                            className="h-8 w-8 p-0"
+                            className="h-8 w-8 p-0 hidden sm:flex"
                         >
                             <ChevronsLeft className="h-4 w-4" />
                         </Button>
@@ -209,18 +209,18 @@ export function DataTable<T extends Record<string, unknown>>({
                             <ChevronLeft className="h-4 w-4" />
                         </Button>
 
-                        <div className="flex items-center gap-1 mx-2">
-                            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                        <div className="flex items-center gap-1 mx-1 sm:mx-2">
+                            {Array.from({ length: Math.min(totalPages <= 3 ? totalPages : 3, totalPages) }, (_, i) => {
                                 let pageNumber: number
-                                
-                                if (totalPages <= 5) {
+
+                                if (totalPages <= 3) {
                                     pageNumber = i + 1
-                                } else if (currentPage <= 3) {
+                                } else if (currentPage <= 2) {
                                     pageNumber = i + 1
-                                } else if (currentPage >= totalPages - 2) {
-                                    pageNumber = totalPages - 4 + i
+                                } else if (currentPage >= totalPages - 1) {
+                                    pageNumber = totalPages - 2 + i
                                 } else {
-                                    pageNumber = currentPage - 2 + i
+                                    pageNumber = currentPage - 1 + i
                                 }
 
                                 return (
@@ -229,7 +229,7 @@ export function DataTable<T extends Record<string, unknown>>({
                                         variant={currentPage === pageNumber ? "default" : "outline"}
                                         size="sm"
                                         onClick={() => handlePageChange(pageNumber)}
-                                        className="h-8 w-8 p-0"
+                                        className="h-8 w-8 p-0 text-xs sm:text-sm"
                                     >
                                         {pageNumber}
                                     </Button>
@@ -251,7 +251,7 @@ export function DataTable<T extends Record<string, unknown>>({
                             size="sm"
                             onClick={() => handlePageChange(totalPages)}
                             disabled={!canGoNext}
-                            className="h-8 w-8 p-0"
+                            className="h-8 w-8 p-0 hidden sm:flex"
                         >
                             <ChevronsRight className="h-4 w-4" />
                         </Button>
@@ -263,8 +263,8 @@ export function DataTable<T extends Record<string, unknown>>({
 
     return (
         <div className="overflow-hidden rounded-lg border">
-            <div className="overflow-x-auto">
-                <table className={"min-w-full" + (tableClassName ?? "") }>
+            <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                <table className={"w-full table-auto" + (tableClassName ?? "")}>
                     <thead className={"bg-[#7B756D]/75 text-left text-xs uppercase " + (headClassName ?? "")}>
                         <tr>
                             {columns.map((col, idx) => {
@@ -273,7 +273,7 @@ export function DataTable<T extends Record<string, unknown>>({
                                     <th
                                         key={String(col.key)}
                                         className={
-                                            "px-4 py-3 font-medium " +
+                                            "px-2 py-3 font-medium sm:px-4 " +
                                             (idx === 0 ? " rounded-tl-lg" : "") +
                                             (idx === columns.length - 1 ? " rounded-tr-lg" : "") +
                                             (col.className ? " " + col.className : "") +
@@ -281,8 +281,8 @@ export function DataTable<T extends Record<string, unknown>>({
                                         }
                                         onClick={() => isSortable && handleSort(col.key)}
                                     >
-                                        <div className="flex items-center gap-2">
-                                            <span>{col.header}</span>
+                                        <div className="flex items-center gap-1 sm:gap-2">
+                                            <span className="text-xs sm:text-xs">{col.header}</span>
                                             {getSortIcon(col.key)}
                                         </div>
                                     </th>
@@ -299,12 +299,12 @@ export function DataTable<T extends Record<string, unknown>>({
                                         const width = col.skeletonClassName
                                             ? col.skeletonClassName
                                             : cIdx === 0
-                                                ? "w-16"
+                                                ? "w-12 sm:w-16"
                                                 : cIdx === 1
-                                                    ? "w-32"
-                                                    : "w-24";
+                                                    ? "w-24 sm:w-32"
+                                                    : "w-16 sm:w-24";
                                         return (
-                                            <td key={String(col.key)} className={"px-4 py-3 " + (col.className ?? "")}>
+                                            <td key={String(col.key)} className={"px-2 py-3 sm:px-4 " + (col.className ?? "")}>
                                                 <div className={`${base} ${width}`} />
                                             </td>
                                         )
@@ -313,16 +313,18 @@ export function DataTable<T extends Record<string, unknown>>({
                             ))
                         ) : paginatedData.length === 0 ? (
                             <tr>
-                                <td className="px-4 py-6 text-sm text-muted-foreground" colSpan={columns.length}>
+                                <td className="px-2 py-6 text-xs sm:px-4 sm:text-sm text-muted-foreground text-center" colSpan={columns.length}>
                                     {emptyMessage}
                                 </td>
                             </tr>
                         ) : (
                             paginatedData.map((row, idx) => (
-                                <tr key={idx} className={rowClassName}>
+                                <tr key={idx} className={`hover:bg-muted/50 ${rowClassName ?? ""}`}>
                                     {columns.map(col => (
-                                        <td key={String(col.key)} className={"px-4 py-3 " + (col.className ?? "")}>
-                                            {col.cell ? col.cell(row) : String(row[col.key as keyof T] ?? "")}
+                                        <td key={String(col.key)} className={"px-2 py-3 text-xs sm:px-4 sm:text-sm " + (col.className ?? "")}>
+                                            <div className="break-words">
+                                                {col.cell ? col.cell(row) : String(row[col.key as keyof T] ?? "")}
+                                            </div>
                                         </td>
                                     ))}
                                 </tr>
@@ -331,7 +333,7 @@ export function DataTable<T extends Record<string, unknown>>({
                     </tbody>
                 </table>
             </div>
-            
+
             {renderPagination()}
         </div>
     )

@@ -21,28 +21,28 @@ export function FollowUpStatus() {
       setLoading(true)
       const response = await fetch('/api/follow-up')
       const result = await response.json()
-      
+
       if (result.success && result.data) {
         const leads = result.data.leads || []
         const today = new Date()
-        
+
         // Calcular estatísticas
         const overdue = leads.filter((lead: any) => {
           const nextContact = new Date(lead.nextContact)
           return nextContact < today
         }).length
-        
+
         const todayLeads = leads.filter((lead: any) => {
           const nextContact = new Date(lead.nextContact)
           const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate())
           const todayEnd = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000)
           return nextContact >= todayStart && nextContact < todayEnd
         }).length
-        
-        const inProgress = leads.filter((lead: any) => 
+
+        const inProgress = leads.filter((lead: any) =>
           lead.status === 'Contatado' || lead.status === 'Qualificado'
         ).length
-        
+
         setStats({
           total: leads.length,
           overdue,
@@ -111,7 +111,7 @@ export function FollowUpStatus() {
           </p>
         </CardContent>
       </Card>
-      
+
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Atrasados</CardTitle>
@@ -124,7 +124,7 @@ export function FollowUpStatus() {
           </p>
         </CardContent>
       </Card>
-      
+
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Hoje</CardTitle>
@@ -137,14 +137,14 @@ export function FollowUpStatus() {
           </p>
         </CardContent>
       </Card>
-      
+
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Em Andamento</CardTitle>
           <Users className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-blue-600">{stats?.inProgress || 0}</div>
+          <div className="text-2xl font-bold text-green-600">{stats?.inProgress || 0}</div>
           <p className="text-xs text-muted-foreground">
             Leads em negociação
           </p>

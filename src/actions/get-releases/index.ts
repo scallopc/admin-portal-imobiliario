@@ -5,7 +5,11 @@ import { type Release } from "@/schemas/release";
 
 export async function getReleases(): Promise<Release[]> {
   try {
-    const snapshot = await adminDb.collection("releases").get();
+    // Ordenar por createdAt desc para mostrar os mais recentes primeiro
+    const snapshot = await adminDb
+      .collection("releases")
+      .orderBy("createdAt", "desc")
+      .get();
 
     const releases: Release[] = [];
 
@@ -22,6 +26,7 @@ export async function getReleases(): Promise<Release[]> {
       releases.push(releaseData as Release);
     }
 
+    console.log(`Buscados ${releases.length} lançamentos do Firebase`);
     return releases;
   } catch (error) {
     console.error("Erro ao buscar lançamentos:", error);
