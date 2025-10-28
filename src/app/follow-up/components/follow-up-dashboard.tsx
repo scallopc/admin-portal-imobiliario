@@ -101,7 +101,7 @@ export function FollowUpDashboard() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           to: lead.phone,
-          message: `Olá ${lead.name}! Estamos entrando em contato sobre seu interesse em nossos imóveis. Nossa equipe está à disposição para esclarecer dúvidas e agendar uma visita. Entre em contato conosco!`,
+          message: `Olá ${lead.name}! Estamos entrando em contato sobre seu interesse em nossos imóveis. Nossa equipe está à disposição para esclarecer dúvidas e agendar uma visita. Entre em contato conosco! zonasullancamentos.com.br`,
           leadId: lead.id,
         }),
       });
@@ -143,7 +143,7 @@ export function FollowUpDashboard() {
       const response = await fetch("/api/sms/send-bulk", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           leads: data.leads.map(lead => ({
             to: lead.phone,
             message: `Olá ${lead.name}! Estamos entrando em contato sobre seu interesse em nossos imóveis. Nossa equipe está à disposição para esclarecer dúvidas e agendar uma visita. Entre em contato conosco!`,
@@ -306,7 +306,7 @@ export function FollowUpDashboard() {
                               Marcar como Qualificado
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem 
+                            <DropdownMenuItem
                               onClick={() => handleAction(lead.id, "lost")}
                               className="text-destructive focus:text-destructive"
                             >

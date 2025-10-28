@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getSmsStatus } from "@/actions/twilio-sms";
+import { getSmsStatus } from "@/actions/send-sms";
 
 export const smsStatusQueryKey = (messageId: string) => ["sms", "status", messageId] as const;
 

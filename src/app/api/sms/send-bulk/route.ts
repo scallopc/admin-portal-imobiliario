@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { sendSms } from "@/actions/twilio-sms";
-import { sendSmsSchema } from "@/actions/twilio-sms/schema";
+import { sendSms } from "@/actions/send-sms";
+import { sendSmsSchema } from "@/actions/send-sms/schema";
 import { z } from "zod";
 
 const sendBulkSmsSchema = z.object({

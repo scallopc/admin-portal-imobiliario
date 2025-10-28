@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { SmsSender, SmsStatus } from "@/components/sms";
 import { useSendSms } from "@/hooks/mutations/use-send-sms";
-import { SMS_TEMPLATES } from "@/actions/twilio-sms";
+import { SMS_TEMPLATES } from "@/actions/send-sms";
 import {
   MessageSquare,
   Send,
@@ -202,7 +202,7 @@ export function FollowUpSmsIntegration({ leads, onLeadUpdate }: FollowUpSmsInteg
                 Follow-up via SMS
               </CardTitle>
               <CardDescription>
-                Envie SMS personalizados para seus leads usando Twilio
+                Envie SMS personalizados para seus leads (DEV MODE)
               </CardDescription>
             </div>
             

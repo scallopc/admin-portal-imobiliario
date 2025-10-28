@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSmsStatus } from "@/actions/twilio-sms";
+import { getSmsStatus } from "@/actions/send-sms";
 
 export async function GET(
   request: NextRequest,

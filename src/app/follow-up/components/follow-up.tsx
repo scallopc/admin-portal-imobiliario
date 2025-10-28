@@ -2,7 +2,6 @@ import { Suspense } from 'react'
 import { FollowUpDashboard } from '@/app/follow-up/components/follow-up-dashboard'
 import { FollowUpSkeleton } from '@/app/follow-up/components/follow-up-skeleton'
 import { FollowUpStatus } from '@/app/follow-up/components/follow-up-status'
-import { SmsDiagnostics } from '@/components/sms'
 import Title from '@/components/common/title'
 
 
@@ -15,7 +14,6 @@ export default function FollowUp() {
 
       <Suspense fallback={<FollowUpSkeleton />}>
         <FollowUpStatus />
-        <SmsDiagnostics />
         <FollowUpDashboard />
       </Suspense>
     </div>

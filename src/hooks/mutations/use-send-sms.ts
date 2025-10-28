@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { sendSms } from "@/actions/twilio-sms";
-import type { SendSmsInput } from "@/actions/twilio-sms/schema";
+import { sendSms } from "@/actions/send-sms";
+import type { SendSmsInput } from "@/actions/send-sms/schema";
 import { toast } from "sonner";
 
 export const sendSmsMutationKey = () => ["sms", "send"] as const;
